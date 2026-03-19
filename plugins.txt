@@ -1,0 +1,13 @@
+# powerlevel10k
+romkatv/powerlevel10k
+
+# git 使用 omz 版本
+ohmyzsh/ohmyzsh path:plugins/git
+# fzf 使用 omz 版本
+ohmyzsh/ohmyzsh path:plugins/fzf
+
+# autosuggestions
+zsh-users/zsh-autosuggestions
+
+# zoxide
+ajeetdsouza/zoxide
