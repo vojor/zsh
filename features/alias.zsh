@@ -1,7 +1,5 @@
 #configuration alias
 alias zshconfig='cd ~/.config/zsh && tree'
-alias setproxy='export http_proxy="http://192.168.176.1:10810" && export https_proxy="http://192.168.176.1:10810"'
-alias unsetproxy='unset http_proxy https_proxy'
 
 ## short replace long
 alias au='antidote update'

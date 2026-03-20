@@ -1,15 +1,18 @@
 # 防止重复加载
-[[ -n $ZSH_MODULAR_LOADED ]] && return
+if [[ -n $ZSH_MODULAR_LOADED && ! -o INTERACTIVE ]]; then
+    return
+fi
 export ZSH_MODULAR_LOADED=1
 
-# 基础路径
+# Basic Path
 ZSH_CONFIG_DIR="$HOME/.config/zsh"
 
-# 主题（必须最早）
+# Theme (priority load)
 source $ZSH_CONFIG_DIR/ui/p10k.zsh
 
-# 补全优先初始化
+# Completion priority initialization
 autoload -Uz compinit
+[[ -d ~/.zsh/cache ]] || mkdir -p ~/.zsh/cache
 compinit -d ~/.zsh/cache/zcompdump -C
 
 # 插件系统
@@ -31,5 +34,5 @@ source $ZSH_CONFIG_DIR/features/misc.zsh
 source $ZSH_CONFIG_DIR/ui/colors.zsh
 source $ZSH_CONFIG_DIR/ui/highlight.zsh
 
-# 补全（最后）
+# 补全
 source $ZSH_CONFIG_DIR/plugins/completion.zsh

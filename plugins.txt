@@ -1,5 +1,10 @@
+# Theme(first load)
 romkatv/powerlevel10k
-ohmyzsh/ohmyzsh path:plugins/git kind:defer
+
+# Tools(not lazy load)
+ohmyzsh/ohmyzsh path:plugins/git
+ajeetdsouza/zoxide
+
+# Lazy load
 ohmyzsh/ohmyzsh path:plugins/fzf kind:defer
 zsh-users/zsh-autosuggestions kind:defer
-ajeetdsouza/zoxide kind:defer
