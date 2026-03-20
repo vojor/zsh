@@ -4,6 +4,7 @@ alias setproxy='export http_proxy="http://192.168.176.1:10810" && export https_p
 alias unsetproxy='unset http_proxy https_proxy'
 
 ## short replace long
+alias au='antidote update'
 alias pt='procs -t'
 alias ign='ig --editor neovim'
 alias n='nvim'
