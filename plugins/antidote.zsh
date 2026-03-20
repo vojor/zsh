@@ -1,13 +1,12 @@
-# Antidote plugin manager
-source ~/.antidote/antidote.zsh
+ZSH_PLUGIN_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+ZSH_PLUGIN_FILE="$ZSH_PLUGIN_DIR/plugins.txt"
+ZSH_BUNDLE_FILE="$ZSH_PLUGIN_DIR/plugins.zsh"
 
-# 插件列表文件
-zstyle ':antidote:bundle' file ~/.config/zsh/plugins.txt
-
-# 生成 bundle（第一次执行）
-if [[ ! -f ~/.config/zsh/plugins.zsh ]]; then
-  antidote bundle < ~/.config/zsh/plugins.txt > ~/.config/zsh/plugins.zsh
+# if not bundle or update txt file
+if [[ ! -f $ZSH_BUNDLE_FILE || $ZSH_PLUGIN_FILE -nt $ZSH_BUNDLE_FILE ]]; then
+    source ~/.antidote/antidote.zsh
+    antidote bundle < "$ZSH_PLUGIN_FILE" > "$ZSH_BUNDLE_FILE"
 fi
 
-# 加载插件
-source ~/.config/zsh/plugins.zsh
+# Load plugin
+source "$ZSH_BUNDLE_FILE"
