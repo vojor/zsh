@@ -6,33 +6,26 @@ export ZSH_MODULAR_LOADED=1
 
 # Basic Path
 ZSH_CONFIG_DIR="$HOME/.config/zsh"
+[[ -d "$HOME/.zsh/cache" ]] || mkdir -p "$HOME/.zsh/cache"
 
 # Theme (priority load)
-source $ZSH_CONFIG_DIR/ui/p10k.zsh
+[[ -r "$ZSH_CONFIG_DIR/ui/p10k.zsh" ]] && source "$ZSH_CONFIG_DIR/ui/p10k.zsh"
 
 # Completion priority initialization
 autoload -Uz compinit
-[[ -d ~/.zsh/cache ]] || mkdir -p ~/.zsh/cache
-compinit -d ~/.zsh/cache/zcompdump -C
+compinit -i -u -d "$HOME/.zsh/cache/zcompdump" -C
 
 # 插件系统
-source $ZSH_CONFIG_DIR/plugins/antidote.zsh
-
-# 核心配置
-source $ZSH_CONFIG_DIR/core/env.zsh
-source $ZSH_CONFIG_DIR/core/path.zsh
-source $ZSH_CONFIG_DIR/core/options.zsh
-source $ZSH_CONFIG_DIR/core/keybind.zsh
-
-# 功能模块
-source $ZSH_CONFIG_DIR/features/alias.zsh
-source $ZSH_CONFIG_DIR/features/history.zsh
-source $ZSH_CONFIG_DIR/features/yazi.zsh
-source $ZSH_CONFIG_DIR/features/misc.zsh
-
-# UI 增强
-source $ZSH_CONFIG_DIR/ui/colors.zsh
-source $ZSH_CONFIG_DIR/ui/highlight.zsh
-
-# 补全
-source $ZSH_CONFIG_DIR/plugins/completion.zsh
+source "$ZSH_CONFIG_DIR/plugins/antidote.zsh"
+# 模块化加载配置 (注意加载顺序)
+source "$ZSH_CONFIG_DIR/core/env.zsh"
+source "$ZSH_CONFIG_DIR/core/path.zsh"
+source "$ZSH_CONFIG_DIR/core/options.zsh"
+source "$ZSH_CONFIG_DIR/core/keybind.zsh"
+source "$ZSH_CONFIG_DIR/features/alias.zsh"
+source "$ZSH_CONFIG_DIR/features/history.zsh"
+source "$ZSH_CONFIG_DIR/features/yazi.zsh"
+source "$ZSH_CONFIG_DIR/features/misc.zsh"
+source "$ZSH_CONFIG_DIR/ui/colors.zsh"
+source "$ZSH_CONFIG_DIR/ui/highlight.zsh"
+source "$ZSH_CONFIG_DIR/plugins/completion.zsh"
