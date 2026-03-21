@@ -17,7 +17,6 @@ alias ht='htop'
 alias hy='hexyl'
 alias hf='hyperfine'
 alias acr='autocorrect'
-alias wh='whereis'
 
 ## shell command
 alias cp='cp -iv'
