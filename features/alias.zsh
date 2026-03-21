@@ -1,5 +1,8 @@
 # Core revise
 alias sudo='sudo '
+alias watch='watch '
+alias time='time '
+alias xargs='xargs '
 
 #configuration alias
 alias zshconfig='cd ~/.config/zsh && tree'
