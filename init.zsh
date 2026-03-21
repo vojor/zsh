@@ -1,3 +1,4 @@
+[[ -r "$HOME/.config/zsh/scheme/start_p10k.zsh" ]] && source "$HOME/.config/zsh/scheme/start_p10k.zsh"
 # 防止重复加载
 if [[ -n $ZSH_MODULAR_LOADED && ! -o INTERACTIVE ]]; then
     return
@@ -7,9 +8,6 @@ export ZSH_MODULAR_LOADED=1
 # Basic Path
 ZSH_CONFIG_DIR="$HOME/.config/zsh"
 [[ -d "$HOME/.zsh/cache" ]] || mkdir -p "$HOME/.zsh/cache"
-
-# Theme (priority load)
-[[ -r "$ZSH_CONFIG_DIR/ui/p10k.zsh" ]] && source "$ZSH_CONFIG_DIR/ui/p10k.zsh"
 
 # Completion priority initialization
 autoload -Uz compinit
@@ -22,10 +20,14 @@ source "$ZSH_CONFIG_DIR/core/env.zsh"
 source "$ZSH_CONFIG_DIR/core/path.zsh"
 source "$ZSH_CONFIG_DIR/core/options.zsh"
 source "$ZSH_CONFIG_DIR/core/keybind.zsh"
+
 source "$ZSH_CONFIG_DIR/features/alias.zsh"
 source "$ZSH_CONFIG_DIR/features/history.zsh"
 source "$ZSH_CONFIG_DIR/features/yazi.zsh"
 source "$ZSH_CONFIG_DIR/features/misc.zsh"
-source "$ZSH_CONFIG_DIR/ui/colors.zsh"
-source "$ZSH_CONFIG_DIR/ui/highlight.zsh"
-source "$ZSH_CONFIG_DIR/plugins/completion.zsh"
+
+source "$ZSH_CONFIG_DIR/utils/colors.zsh"
+source "$ZSH_CONFIG_DIR/utils/highlight.zsh"
+source "$ZSH_CONFIG_DIR/utils/completion.zsh"
+
+[[ -f "$ZSH_CONFIG_DIR/scheme/end_p10k.zsh" ]] && source "$ZSH_CONFIG_DIR/scheme/end_p10k.zsh"

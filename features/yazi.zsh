@@ -1,5 +1,3 @@
-# yazi 快速跳转
-
 y() {
   local tmp cwd
   tmp=$(mktemp -t yazi-cwd.XXXXXX) || return

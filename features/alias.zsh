@@ -2,7 +2,7 @@
 alias zshconfig='cd ~/.config/zsh && tree'
 
 ## short replace long
-alias au='antidote update'
+alias au='antidote-update'
 alias pt='procs -t'
 alias ign='ig --editor neovim'
 alias n='nvim'

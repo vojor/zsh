@@ -6,23 +6,43 @@ ZSH_BUNDLE_FILE="$ZSH_PLUGIN_DIR/plugins.zsh"
 if [[ -f "$HOME/.antidote/antidote.zsh" ]]; then
     source "$HOME/.antidote/antidote.zsh"
 else
-    echo "WARNING: Antidote not found!"
+    echo "Warning: Antidote not found!"
 fi
+
+# Define update logic
 antidote-update() {
-    echo "Updating zsh new plugins"
+    echo "Updating zsh plugins bundle..."
+
+    if [[ -z "$ALL_PROXY" && -z "$http_proxy" ]]; then
+        echo "Warning: No proxy detected. Plugin download might fail or hang."
+    fi
+
     if [[ -f "$ZSH_PLUGIN_FILE" ]]; then
-        antidote bundle < "$ZSH_PLUGIN_FILE" > "$ZSH_BUNDLE_FILE"
-        source "$ZSH_BUNDLE_FILE"
-        echo "OK: plugins success update"
+        local TMP_BUNDLE="${ZSH_BUNDLE_FILE}.tmp"
+
+        echo "Run antidote bundle..."
+
+        if antidote bundle < "$ZSH_PLUGIN_FILE" > "$TMP_BUNDLE"; then
+            mv "$TMP_BUNDLE" "$ZSH_BUNDLE_FILE"
+            source "$ZSH_BUNDLE_FILE"
+
+            echo "Success: plugins bundle and loaded"
+        else
+            echo "Error: antidote bundle failed。"
+            echo "Retain original configuration，please check network."
+
+            [[ -f "$TMP_BUNDLE" ]] && rm "$TMP_BUNDLE"
+            return 1
+        fi
     else
         echo "Error: plugins.txt file note found"
+        return 1
     fi
 }
 # Startup load logic
 if [[ -f "$ZSH_BUNDLE_FILE" ]]; then
-    # If plugins.zsh survival,load
     source "$ZSH_BUNDLE_FILE"
 else
-    echo "First start, initialization plugins"
+    echo "First start, initializing plugins"
     antidote-update
 fi
