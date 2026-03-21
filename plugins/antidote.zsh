@@ -5,6 +5,7 @@ ZSH_BUNDLE_FILE="$ZSH_PLUGIN_DIR/plugins.zsh"
 # Load antidote
 if [[ -f "$HOME/.antidote/antidote.zsh" ]]; then
     source "$HOME/.antidote/antidote.zsh"
+    zstyle ':antidote:bundle' depth 1
 else
     echo "Warning: Antidote not found!"
 fi
