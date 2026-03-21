@@ -13,7 +13,7 @@ fi
 antidote-update() {
     echo "Updating zsh plugins bundle..."
 
-    if [[ -z "$ALL_PROXY" && -z "$http_proxy" ]]; then
+    if [[ -z "$all_proxy" && -z "$http_proxy" -z "$https_proxy" ]]; then
         echo "Warning: No proxy detected. Plugin download might fail or hang."
     fi
 
