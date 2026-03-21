@@ -1,3 +1,6 @@
+# Core revise
+alias sudo='sudo '
+
 #configuration alias
 alias zshconfig='cd ~/.config/zsh && tree'
 
@@ -13,20 +16,22 @@ alias ac='aria2c'
 alias ht='htop'
 alias hy='hexyl'
 alias hf='hyperfine'
-alias hx='helix'
 alias acr='autocorrect'
 alias wh='whereis'
 
 ## shell command
 alias cp='cp -iv'
 alias mv='mv -iv'
-alias rm='rm -iv'
+alias rm='rm -iv --preserve-root'
+alias mkdir='mkdir -pv'
 
 ## replace GNU command
-alias ls='eza'
+alias ls='eza --icons'
 alias l='eza -lagh --icons'
 alias la='eza -a --icons'
 alias ll='eza -lgh --icons'
+alias lt='eza -lgh --sort=modified --icons'
+alias li='eza -lgh --git --icons'
 alias tree='eza -T --icons'
 
 alias uq='ug -Q'
