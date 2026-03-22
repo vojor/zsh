@@ -20,7 +20,7 @@ ZSH_INIT_FILE="$ZSH_CONFIG_DIR/init.zsh"
 if [[ -f "$ZSH_INIT_FILE" ]]; then
     source "$ZSH_INIT_FILE"
 else
-    echo "Error: initialization file not found"
+    print -P "%F{red}%BError:%b%f %F{172}Initialization file not found.%f"
 fi
 
 [[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"

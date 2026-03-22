@@ -7,36 +7,35 @@ if [[ -f "$HOME/.antidote/antidote.zsh" ]]; then
     source "$HOME/.antidote/antidote.zsh"
     zstyle ':antidote:bundle' depth 1
 else
-    echo "Warning: Antidote not found!"
+    print -P "%F{244}[%D{%H:%M:%S}]%f %F{yellow}%BWarning:%b%f %F{242}Antidote not found.%f"
 fi
 
 # Define update logic
 antidote-update() {
-    echo "Updating zsh plugins bundle..."
+    print -P "%F{blue}%BUpdating plugins bundle...%b%f"
 
     if [[ -z "$all_proxy" && -z "$http_proxy" -z "$https_proxy" ]]; then
-        echo "Warning: No proxy detected. Plugin download might fail or hang."
+        print -P "%F{244}[%D{%H:%M:%S}]%f %F{yellow}%BWarning:%b%f %F{242}No proxy detected, plugin download might fail or hang.%f"
     fi
 
     if [[ -f "$ZSH_PLUGIN_FILE" ]]; then
         local TMP_BUNDLE="${ZSH_BUNDLE_FILE}.tmp"
 
-        echo "Run antidote bundle..."
+        print -P "%F{blue}%BRun antidote bundle...%b%f"
 
         if antidote bundle < "$ZSH_PLUGIN_FILE" > "$TMP_BUNDLE"; then
             mv "$TMP_BUNDLE" "$ZSH_BUNDLE_FILE"
             source "$ZSH_BUNDLE_FILE"
 
-            echo "Success: plugins bundle and loaded"
+            print -P "%F{244}[%D{%H:%M:%S}]%f %F{green}%BSuccess:%b%f %F{blue}plugins bundle and loaded.%f"
         else
-            echo "Error: antidote bundle failed。"
-            echo "Retain original configuration，please check network."
+            print -P "%F{244}[%D{%H:%M:%S}]%f %F{red}%BError:%b%f %F{172}antidote bundle failed, retain..., check network%f"
 
             [[ -f "$TMP_BUNDLE" ]] && rm "$TMP_BUNDLE"
             return 1
         fi
     else
-        echo "Error: plugins.txt file note found"
+        print -P "%F{244}[%D{%H:%M:%S}]%f %F{red}%BError:%b%f %F{172}plugins.txt file not found%f"
         return 1
     fi
 }
@@ -44,6 +43,6 @@ antidote-update() {
 if [[ -f "$ZSH_BUNDLE_FILE" ]]; then
     source "$ZSH_BUNDLE_FILE"
 else
-    echo "First start, initializing plugins"
+    print -P "%F{green}%BInitializing plugins...%b%f"
     antidote-update
 fi
