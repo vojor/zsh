@@ -1,5 +1,3 @@
-[[ -r "$HOME/.config/zsh/scheme/start_p10k.zsh" ]] && source "$HOME/.config/zsh/scheme/start_p10k.zsh"
-
 # 防止重复加载
 if [[ -n $ZSH_MODULAR_LOADED && ! -o INTERACTIVE ]]; then
     return
@@ -7,14 +5,18 @@ fi
 export ZSH_MODULAR_LOADED=1
 
 # Basic Path
-ZSH_CONFIG_DIR="$HOME/.config/zsh"
-ZSH_COMPDUMP="$HOME/.zsh/cache/zcompdump"
-[[ -d "$HOME/.zsh/cache" ]] || mkdir -p "$HOME/.zsh/cache"
+ZSH_USER_CACHE="$HOME/.zsh/cache"
+[[ -d "$ZSH_USER_CACHE" ]] || mkdir -p "$ZSH_USER_CACHE"
 
-# 扩展匹配
-setopt EXTENDED_GLOB
+# 核心和基础配置
+source "$ZSH_CONFIG_DIR/core/path.zsh"
+source "$ZSH_CONFIG_DIR/core/env.zsh"
+source "$ZSH_CONFIG_DIR/core/history.zsh"
+source "$ZSH_CONFIG_DIR/core/colors.zsh"
+source "$ZSH_CONFIG_DIR/core/options.zsh"
 
 # Completion priority initialization
+ZSH_COMPDUMP="${ZSH_USER_CACHE}/zcompdump"
 zmodload zsh/complist 2>/dev/null
 autoload -Uz compinit
 if [[ -n "$ZSH_COMPDUMP"(#qN.mh-12) ]]; then
@@ -30,20 +32,14 @@ if [[ -s "$ZSH_COMPDUMP" ]]; then
 fi
 source "$ZSH_CONFIG_DIR/utils/completion.zsh"
 
-# 插件系统
+# 插件加载及配置
 source "$ZSH_CONFIG_DIR/plugins/antidote.zsh"
-# 模块化加载配置 (注意加载顺序)
-source "$ZSH_CONFIG_DIR/core/env.zsh"
-source "$ZSH_CONFIG_DIR/core/path.zsh"
-source "$ZSH_CONFIG_DIR/core/options.zsh"
-source "$ZSH_CONFIG_DIR/core/keybind.zsh"
 
-source "$ZSH_CONFIG_DIR/features/alias.zsh"
-source "$ZSH_CONFIG_DIR/features/history.zsh"
-source "$ZSH_CONFIG_DIR/features/misc.zsh"
-source "$ZSH_CONFIG_DIR/features/yazi.zsh"
+# 功能优化
+source "$ZSH_CONFIG_DIR/extend/misc.zsh"
+source "$ZSH_CONFIG_DIR/extend/yazi.zsh"
 
-source "$ZSH_CONFIG_DIR/utils/colors.zsh"
 source "$ZSH_CONFIG_DIR/utils/highlight.zsh"
 
-[[ -f "$ZSH_CONFIG_DIR/scheme/end_p10k.zsh" ]] && source "$ZSH_CONFIG_DIR/scheme/end_p10k.zsh"
+source "$ZSH_CONFIG_DIR/features/keybind.zsh"
+source "$ZSH_CONFIG_DIR/features/alias.zsh"

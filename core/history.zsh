@@ -1,12 +1,9 @@
-# 自动创建历史记录目录
-[[ ! -d "$HOME/.local/share/zsh" ]] && mkdir -p "$HOME/.local/share/zsh"
-
 #历史纪录条目数量
 export HISTSIZE=100000
 #保存的历史纪录条目数量
 export SAVEHIST=100000
 #历史纪录文件位置
-export HISTFILE="$HOME/.local/share/zsh/history"
+export HISTFILE="${ZSH_USER_CACHE}/history"
 
 # 同步策略
 #以附加的方式写入历史纪录

@@ -1,5 +1,3 @@
-setopt extended_glob
-
 # 变色前缀
 typeset -g -a TOKENS_FOLLOWED_BY_COMMANDS
 TOKENS_FOLLOWED_BY_COMMANDS=('|' '||' ';' '&' '&&' 'sudo' 'do' 'time' 'strace' 'if' 'then' 'else' 'elif' 'while' 'until')

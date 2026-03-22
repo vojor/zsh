@@ -20,4 +20,4 @@ path=(
     $path
 )
 
-export PATH
+path=($^path(N-/))
