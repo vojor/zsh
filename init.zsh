@@ -1,4 +1,5 @@
 [[ -r "$HOME/.config/zsh/scheme/start_p10k.zsh" ]] && source "$HOME/.config/zsh/scheme/start_p10k.zsh"
+
 # 防止重复加载
 if [[ -n $ZSH_MODULAR_LOADED && ! -o INTERACTIVE ]]; then
     return
@@ -7,11 +8,15 @@ export ZSH_MODULAR_LOADED=1
 
 # Basic Path
 ZSH_CONFIG_DIR="$HOME/.config/zsh"
+ZSH_COMPDUMP="$HOME/.zsh/cache/zcompdump"
 [[ -d "$HOME/.zsh/cache" ]] || mkdir -p "$HOME/.zsh/cache"
 
 # Completion priority initialization
 autoload -Uz compinit
-compinit -i -u -d "$HOME/.zsh/cache/zcompdump" -C
+compinit -i -u -d "$ZSH_COMPDUMP" -C
+if [[ -s "$ZSH_COMPDUMP" && (! -s "${ZSH_COMPDUMP}.zwc" || "$ZSH_COMPDUMP" -nt "${ZSH_COMPDUMP}.zwc") ]]; then
+    zcompile "$ZSH_COMPDUMP"
+fi
 
 # 插件系统
 source "$ZSH_CONFIG_DIR/plugins/antidote.zsh"
