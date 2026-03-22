@@ -1,9 +1,10 @@
-# --- 彩色补全模块 ---
-zmodload zsh/complist 2>/dev/null
-
-# 仅在 LS_COLORS 为空时初始化
+# 优先使用 vivid，否则退回 LS_COLORS 且仅在 LS_COLORS 为空时初始化
 if [[ -z "$LS_COLORS" ]]; then
-    (( $+commands[dircolors] )) && eval "$(dircolors -b)"
+    if (( $+commands[vivid] )); then
+        export LS_COLORS="$(vivid generate tokyonight-night)"
+    elif (( $+commands[dircolors] )); then
+        eval "$(dircolors -b)"
+    fi
 fi
 
 # 补全菜单风格
