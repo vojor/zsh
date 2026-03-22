@@ -17,5 +17,10 @@ if (( $+commands[fd] )); then
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
 
+if (( $+commands[rg] )); then
+    export FZF_DEFAULT_COMMAND='rg --files'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
+
 local preview_cmd='[[ -d {} ]] && eza --tree --color=always {} | head -200 || (bat --style=numbers --color=always {} || cat {}) 2>/dev/null | head -500'
 export FZF_DEFAULT_OPTS="--height 45% --layout=reverse --border --preview '$preview_cmd'"
