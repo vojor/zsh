@@ -35,5 +35,6 @@ export FZF_DEFAULT_OPTS="
   --preview '$preview_logic'
   --preview-window=right:60%:wrap
   --bind 'ctrl-/:toggle-preview'
+  --bind 'alt-j:preview-down,alt-k:preview-up'
   --color=header:italic
 "

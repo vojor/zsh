@@ -9,14 +9,40 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# ZSH Config Dir
-export ZSH_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export ZSH_CONFIG_DIR="${XDG_CONFIG_HOME}/zsh"
+export ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
+export ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
+mkdir -p "$ZSH_CONFIG_DIR" "$ZSH_CACHE_DIR" "$ZSH_DATA_DIR" 2>/dev/null
 
-# Boot start, proxy set
-source "$ZSH_CONFIG_DIR/boot/proxy.zsh"
+if [[ ! -f "${XDG_DATA_HOME}/.antidote/antidote.zsh" ]]; then
+    if [[ -n "$all_proxy" || -n "$http_proxy" || -n "$https_proxy" ]]; then
+        print -P "%F{blue}%BDetecting proxy, auto-installing Antidote...%b%f"
+        if git clone --depth=1 https://github.com/mattmc3/antidote.git "${XDG_DATA_HOME}/.antidote" &>/dev/null;then
+            print -P "%F{green}Antidote installed successfully!%f"
 
-# Load zsh configure
-ZSH_INIT_FILE="$ZSH_CONFIG_DIR/init.zsh"
+            local deps=("eza" "fzf" "fd" "rg","zoxide")
+            local missing=()
+            for tool in $deps; do
+                if ! command -v "$tool" &>/dev/null; then missing+=("$tool"); fi
+            done
+
+            if [[ ${#missing[@]} -gt 0 ]]; then
+                print -P "\n%F{160}%BDependency Check Failed:%b%f"
+                print -P "%F{214}Missing tools: %B${missing[*]}%b%f"
+                print -P "%F{76}Please install them, then run: %B%F{32}source ~/.zshrc%b%f\n"
+                return 1
+            fi
+        fi
+    else
+        print -P "%F{yellow}%BWarning:%b No proxy detected. Skipping install antidote.%f"
+        return 1
+    fi
+fi
+
+ZSH_INIT_FILE="${ZSH_CONFIG_DIR}/init.zsh"
 if [[ -f "$ZSH_INIT_FILE" ]]; then
     source "$ZSH_INIT_FILE"
 else
@@ -24,5 +50,4 @@ else
 fi
 
 [[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
-
 ```

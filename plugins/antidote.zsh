@@ -1,10 +1,9 @@
-ZSH_PLUGIN_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
-ZSH_PLUGIN_FILE="$ZSH_PLUGIN_DIR/plugins.txt"
-ZSH_BUNDLE_FILE="$ZSH_PLUGIN_DIR/plugins.zsh"
+ZSH_PLUGIN_FILE="$ZSH_CONFIG_DIR/plugins.txt"
+ZSH_BUNDLE_FILE="$ZSH_CACHE_DIR/plugins.zsh"
 
 # Load antidote
-if [[ -f "$HOME/.antidote/antidote.zsh" ]]; then
-    source "$HOME/.antidote/antidote.zsh"
+if [[ -f "${XDG_DATA_HOME}/.antidote/antidote.zsh" ]]; then
+    source "${XDG_DATA_HOME}/.antidote/antidote.zsh"
     zstyle ':antidote:bundle' depth 1
 else
     print -P "%F{244}[%D{%H:%M:%S}]%f %F{yellow}%BWarning:%b%f %F{242}Antidote not found.%f"
@@ -14,7 +13,7 @@ fi
 antidote-update() {
     print -P "%F{blue}%BUpdating plugins bundle...%b%f"
 
-    if [[ -z "$all_proxy" && -z "$http_proxy" -z "$https_proxy" ]]; then
+    if [[ -z "$all_proxy" && -z "$http_proxy" && -z "$https_proxy" ]]; then
         print -P "%F{244}[%D{%H:%M:%S}]%f %F{yellow}%BWarning:%b%f %F{242}No proxy detected, plugin download might fail or hang.%f"
     fi
 
@@ -40,9 +39,9 @@ antidote-update() {
     fi
 }
 # Startup load logic
-if [[ -f "$ZSH_BUNDLE_FILE" ]]; then
+if [[ -f "$ZSH_BUNDLE_FILE" && "$ZSH_PLUGIN_FILE" -ot "$ZSH_BUNDLE_FILE" ]]; then
     source "$ZSH_BUNDLE_FILE"
 else
-    print -P "%F{green}%BInitializing plugins...%b%f"
+    print -P "%F{green}%BInitializing or updating plugins...%b%f"
     antidote-update
 fi
