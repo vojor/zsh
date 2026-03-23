@@ -2,7 +2,7 @@
 if [[ -n $ZSH_MODULAR_LOADED && ! -o INTERACTIVE ]]; then
     return
 fi
-export ZSH_MODULAR_LOADED=1
+typeset -g ZSH_MODULAR_LOADED=1
 
 # boot
 source "$ZSH_CONFIG_DIR/boot/proxy.zsh"
