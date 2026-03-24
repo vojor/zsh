@@ -4,6 +4,7 @@ romkatv/powerlevel10k
 # Tools(not lazy load)
 ohmyzsh/ohmyzsh path:plugins/git
 ajeetdsouza/zoxide
+zsh-users/zsh-completions
 
 # Lazy load
 ohmyzsh/ohmyzsh path:plugins/fzf kind:defer

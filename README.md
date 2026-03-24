@@ -19,9 +19,9 @@ mkdir -p "$ZSH_CONFIG_DIR" "$ZSH_CACHE_DIR" "$ZSH_DATA_DIR" 2>/dev/null
 
 if [[ ! -f "${XDG_DATA_HOME}/.antidote/antidote.zsh" ]]; then
     if [[ -n "$all_proxy" || -n "$http_proxy" || -n "$https_proxy" ]]; then
-        print -P "%F{blue}%BDetecting proxy, auto-installing Antidote...%b%f"
+        print -P "%F{blue}󰏗 %BDetecting proxy, auto-installing Antidote...%b%f"
         if git clone --depth=1 https://github.com/mattmc3/antidote.git "${XDG_DATA_HOME}/.antidote" &>/dev/null;then
-            print -P "%F{green}Antidote installed successfully!%f"
+            print -P "%F{green}󰄬 Antidote installed successfully!%f"
 
             local deps=("eza" "fzf" "fd" "rg","zoxide")
             local missing=()
@@ -30,14 +30,14 @@ if [[ ! -f "${XDG_DATA_HOME}/.antidote/antidote.zsh" ]]; then
             done
 
             if [[ ${#missing[@]} -gt 0 ]]; then
-                print -P "\n%F{160}%BDependency Check Failed:%b%f"
-                print -P "%F{214}Missing tools: %B${missing[*]}%b%f"
-                print -P "%F{76}Please install them, then run: %B%F{32}source ~/.zshrc%b%f\n"
+                print -P "\n%F{160}󰅚 %BDependency Check Failed:%b%f"
+                print -P "%F{214}󱁤 Missing tools: %B${missing[*]}%b%f"
+                print -P "%F{76}󰑓 Please install them, then run: %B%F{32}source ~/.zshrc%b%f\n"
                 return 1
             fi
         fi
     else
-        print -P "%F{yellow}%BWarning:%b No proxy detected. Skipping install antidote.%f"
+        print -P "%F{yellow} %BWarning:%b No proxy detected. Skipping install antidote.%f"
         return 1
     fi
 fi
@@ -46,7 +46,7 @@ ZSH_INIT_FILE="${ZSH_CONFIG_DIR}/init.zsh"
 if [[ -f "$ZSH_INIT_FILE" ]]; then
     source "$ZSH_INIT_FILE"
 else
-    print -P "%F{red}%BError:%b%f %F{172}Initialization file not found.%f"
+    print -P "%F{red}󰅚 %BError:%b%f %F{172}Initialization file not found.%f"
 fi
 
 [[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"

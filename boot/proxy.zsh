@@ -22,10 +22,10 @@ proxy_on() {
     export HTTPS_PROXY="$proxy_url"
     export ALL_PROXY="$proxy_url"
 
-    print -P "%F{244}[%D{%H:%M:%S}]%f %F{76}%BProxy Success On:%b%f %F{32}${proxy_url}%f"
+    print -P "%F{244}[%D{%H:%M:%S}]%f %F{76}󱊟 %BProxy Success On:%b%f %F{32}${proxy_url}%f"
 }
 
 proxy_off() {
     unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-    print -P "%F{244}[%D{%H:%M:%S}]%f %F{202}%BProxy Success Off%b%f"
+    print -P "%F{244}[%D{%H:%M:%S}]%f %F{202}󱊠 %BProxy Success Off%b%f"
 }

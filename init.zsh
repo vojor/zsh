@@ -40,6 +40,7 @@ source "$ZSH_CONFIG_DIR/plugins/antidote.zsh"
 # 功能优化
 source "$ZSH_CONFIG_DIR/extend/misc.zsh"
 source "$ZSH_CONFIG_DIR/extend/yazi.zsh"
+source "$ZSH_CONFIG_DIR/extend/archive.zsh"
 
 source "$ZSH_CONFIG_DIR/utils/highlight.zsh"
 
