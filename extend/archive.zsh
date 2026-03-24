@@ -6,7 +6,7 @@ extract_logic() {
     [[ -d "$dest" ]] || mkdir -p "$dest"
 
     print -P "%F{blue}󰛒 %f Extracting '$file' to '$dest'..."
-    bsdtar -xf "$file" -C "$dest" && print -P "%F{green}󰄬 %f Done."
+    bsdtar -xpf "$file" -C "$dest" && print -P "%F{244}[%D{%H:%M:%S}]%f %F{green}󰄬 %fExtracting Done."
 }
 
 pack_logic() {
@@ -16,8 +16,13 @@ pack_logic() {
 
     [[ -z "$target" || $count -eq 0 ]] && { print -P "%F{yellow}Usage:%f p <arch.ext> <files...>"; return 1 }
 
+    if [[ -z "${target:e}" ]]; then
+        target="${target}.tar.gz"
+        print -P "%F{yellow} %BWarnin: No extension detected,using default set:%b%f %F{blue}%B$target%b%f"
+    fi
+
     print -P "%F{blue}󰿖 %f Packing %B$count%b item(s) into '$target'..."
-    bsdtar -acf "$target" "$@" && print -P "%F{green}󰄬 %f Created."
+    bsdtar -acf "$target" "$@" && print -P "%F{244}[%D{%H:%M:%S}]%f %F{green}󰄬 %f Created."
 }
 
 (( $+commands[x] )) || alias x='extract_logic'
