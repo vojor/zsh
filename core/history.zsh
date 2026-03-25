@@ -1,9 +1,9 @@
 #历史纪录条目数量
-export HISTSIZE=100000
+HISTSIZE=100000
 #保存的历史纪录条目数量
-export SAVEHIST=100000
+SAVEHIST=100000
 #历史纪录文件位置
-export HISTFILE="${ZSH_DATA_DIR}/history"
+HISTFILE="${ZSH_DATA_DIR}/history"
 
 # 同步策略
 #以附加的方式写入历史纪录
