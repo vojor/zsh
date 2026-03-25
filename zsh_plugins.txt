@@ -1,6 +1,9 @@
 # Theme
 romkatv/powerlevel10k
 
+# Basic
+romkatv/zsh-defer
+
 # completion and initializing
 mattmc3/ez-compinit
 zsh-users/zsh-completions
@@ -13,10 +16,11 @@ getantidote/use-omz
 ohmyzsh/ohmyzsh path:plugins/git
 ohmyzsh/ohmyzsh path:plugins/fzf kind:defer
 
-# Jump and suggest
+# Jump
 ajeetdsouza/zoxide
-zsh-users/zsh-autosuggestions kind:defer
 Aloxaf/fzf-tab
 
+# highlight and suggestion
 zdharma-continuum/fast-syntax-highlighting
+zsh-users/zsh-autosuggestions kind:defer
 zsh-users/zsh-history-substring-search
