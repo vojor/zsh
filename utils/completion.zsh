@@ -59,16 +59,53 @@ zle_highlight=(
     suffix:bold
 )
 
-# Tab 逻辑
+# Tab 逻辑 (调用 fzf-tab 插件)
 user-complete(){
     case "$BUFFER" in
-        "" )           BUFFER="cd "; zle end-of-line; zle expand-or-complete ;;
-        "cd --" )      BUFFER="cd +"; zle end-of-line; zle expand-or-complete ;;
-        "cd +-" )      BUFFER="cd -"; zle end-of-line; zle expand-or-complete ;;
-        ".." )         BUFFER="../"; zle end-of-line; zle expand-or-complete ;;
-        * )            zle expand-or-complete ;;
+        "" )
+            BUFFER="cd "
+            zle end-of-line
+            zle fzf-tab-complete
+            ;;
+        ".." )
+            BUFFER="../"
+            zle end-of-line
+            zle fzf-tab-complete
+            ;;
+        * )
+            if (( $+widgets[fzf-tab-complete] )); then
+                zle fzf-tab-complete
+            else
+                zle expand-or-complete
+            fi
+            ;;
     esac
 }
 zle -N user-complete
-bindkey "\t" user-complete
-bindkey -M menuselect '/' history-incremental-search-forward
+if [[ -n "${key[Tab]}" ]]; then
+    bindkey -- "${key[Tab]}" user-complete
+fi
+
+# 预览逻辑变量
+local ft_preview_cmd='
+  if [[ -d $realpath ]]; then
+    eza --tree --color=always --icons $realpath | head -200
+  else
+    bat --color=always --style=numbers --line-range :500 $realpath 2>/dev/null || cat $realpath
+  fi
+'
+# 全局外观与交互
+zstyle ':fzf-tab:*' fzf-flags '--preview-window=right:60%:wrap' \
+                              '--bind=ctrl-/:toggle-preview' \
+                              '--bind=alt-j:preview-down,alt-k:preview-up' \
+                              '--layout=reverse'
+# 核心补全预览
+zstyle ':fzf-tab:complete:*:*' fzf-preview $ft_preview_cmd
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath'
+# 特殊补全预览
+zstyle ':fzf-tab:complete:kill:argument-rest' fzf-preview 'ps --pid=$word -o cmd --no-headers -w -w'
+zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags '--preview-window=down:3:wrap'
+zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'systemctl status $word'
+zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'echo ${(P)word}'
+# 颜色分组
+zstyle ':fzf-tab:*' group-colors $'\033[32m' $'\033[33m' $'\033[35m' $'\033[31m'

@@ -1,8 +1,19 @@
 # Zsh Config
 
-- Use antidote config zsh
+> **Use antidote config zsh**
 
-- dot_zshrc
+- introduction: use 'fzf-tab','p10k','zsh-suggestions' etc plugins, very beautify,practical and power.
+
+- 1. Installed require cli
+  - The: 'fd','fzf','git','eza','nerd-font','ripgrep','zoxide'.
+- 2. Download and install antidote plugin manage
+  - Terminal enter: 'git clone --depth=1 https://github.com/mattmc3/antidote.git $HOME/.local/share/.antidote'
+- 3. Configure zsh
+  - Terminal enter: 'git clone --depth=1 https://github.com/vojor/zsh.git $HOME/.config/zsh'
+- 4. configure zsh start
+  - Terminal enter: 'touch .zshrc'
+  - copy up to '.zshrc'
+  - startup: 'source ~/.zshrc'
 
 ```sh
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -51,3 +62,5 @@ fi
 
 [[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
 ```
+
+- 5. Plugins auto install.

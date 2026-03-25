@@ -9,6 +9,7 @@ key=(
     Left      "${terminfo[kcub1]}"
     Right     "${terminfo[kcuf1]}"
     Backspace "${terminfo[kbs]}"
+    Tab       "${terminfo[ht]:-$'\t'}"
 )
 
 # 基础功能键绑定
@@ -22,9 +23,21 @@ key=(
 bindkey '^[[1;5C' forward-word       # Ctrl + Right
 bindkey '^[[1;5D' backward-word      # Ctrl + Left
 
-# Smart search (输入前缀后按上下键过滤)
-autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
-zle -N up-line-or-beginning-search
-zle -N down-line-or-beginning-search
-[[ -n "${key[Up]}"   ]] && bindkey -- "${key[Up]}"   up-line-or-beginning-search
-[[ -n "${key[Down]}" ]] && bindkey -- "${key[Down]}" down-line-or-beginning-search
+if (( $+widgets[history-substring-search-up] )); then
+    [[ -n "${key[Up]}"   ]] && bindkey -- "${key[Up]}"   history-substring-search-up
+    [[ -n "${key[Down]}" ]] && bindkey -- "${key[Down]}" history-substring-search-down
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
+
+    HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=magenta,fg=white,bold'
+    HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='bg=red,fg=white,bold'
+else
+    autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+    zle -N up-line-or-beginning-search
+    zle -N down-line-or-beginning-search
+
+    [[ -n "${key[Up]}"   ]] && bindkey -- "${key[Up]}"   up-line-or-beginning-search
+    [[ -n "${key[Down]}" ]] && bindkey -- "${key[Down]}" down-line-or-beginning-search
+    bindkey '^[[A' up-line-or-beginning-search
+    bindkey '^[[B' down-line-or-beginning-search
+fi
