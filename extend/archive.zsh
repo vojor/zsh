@@ -109,3 +109,13 @@ zstyle ":completion:*:*:($extract_cmds):*:*" file-patterns \
     '*(/):directories:目标目录' \
     '*:all-files:所有文件'
 
+zstyle ":completion:*:*:($extract_cmds):*:*" file-patterns \
+    '*.tar(|.*):archives:压缩文件 *.zip:archives:压缩文件 *.7z:archives:archives:压缩文件 *.rar:archives:压缩文件 *.zst:archives:压缩文件' \
+    '*(/):directories:目标目录' \
+    '*:all-files:所有文件'
+
+# 加上这一行，让补全更有序
+zstyle ":completion:*:*:($extract_cmds):*:*" tag-order 'archives' 'directories' 'all-files'
+
+
+
