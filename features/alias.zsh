@@ -11,6 +11,7 @@ alias rm='rm -iv --preserve-root'
 alias mkdir='mkdir -pv'
 
 ## replace GNU
+alias dir='eza -lbF --git'
 alias ls='eza --icons'
 alias tree='eza -T --icons'
 
