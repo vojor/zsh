@@ -45,16 +45,14 @@ pack_logic() {
 alias extract='extract_logic'
 alias pack='pack_logic'
 
-if [[ -n "$compstate" || -n "$functions[compdef]" ]]; then
-    local extract_cmds="x|extract|extract_logic"
-    local pack_cmds="p|pack|pack_logic"
+local extract_cmds="x|extract|extract_logic"
+local pack_cmds="p|pack|pack_logic"
 
-    zstyle ":completion:*:*:($extract_cmds):*:*" file-patterns \
-        '*.tar(|.*):archives *.zip:archives *.7z:archives *.rar:archives *.zst:archives'
-    zstyle ":completion:*:*:($pack_cmds):*:*" file-patterns \
-        '*(/):directories %p:all-files'
+zstyle ":completion:*:*:($extract_cmds):*:*" file-patterns \
+    '*.tar(|.*):archives:压缩文件 *.zip:archives:压缩文件 *.7z:archives:压缩文件 *.rar:archives:压缩文件 *.zst:archives:压缩文件' \
+    '*:all-files:所有文件'
+zstyle ":completion:*:*:($extract_cmds):*:*" tag-order 'archives' 'all-files'
 
-    zstyle ":completion:*:*:($extract_cmds|$pack_cmds):*:*" group-name ''
-    zstyle ":completion:*:*:($extract_cmds|$pack_cmds):*:*" format '%F{blue}== %d ==%f'
-    zstyle ":completion:*:*:($extract_cmds|$pack_cmds):*:*" tag-order 'archives'
-fi
+zstyle ":completion:*:*:($pack_cmds):*:*" file-patterns \
+    '*(/):directories:文件夹 %p:all-files:所有文件'
+zstyle ":completion:*:*:($pack_cmds):*:*" tag-order 'directories' 'all-files'

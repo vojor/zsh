@@ -4,10 +4,10 @@ alias watch='watch '
 alias time='time '
 alias xargs='xargs '
 
-#configuration alias
-alias zshconfig='cd ~/.config/zsh && tree'
+# Fast to
+alias zc='cd ~/.config/zsh && tree'
 
-## short replace long
+# short replace long
 alias au='antidote-update'
 alias pt='procs -t'
 alias ign='ig --editor neovim'
@@ -21,7 +21,7 @@ alias hy='hexyl'
 alias hf='hyperfine'
 alias acr='autocorrect'
 
-## shell command
+# shell command
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -iv --preserve-root'
