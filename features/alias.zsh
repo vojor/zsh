@@ -9,6 +9,7 @@ alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -iv --preserve-root'
 alias mkdir='mkdir -pv'
+alias ez='exec zsh'
 
 ## replace GNU
 alias dir='eza -lbF --git'
