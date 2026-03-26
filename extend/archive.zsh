@@ -1,5 +1,5 @@
 extract_logic() {
-    if [[ $# -eq 0 ]]; then
+    if [[ $# -lt 1 ]]; then
         print -P "%F{yellow}󰋖 Usage:%f x <file1> <file2> ... [destination_dir]"
         return 1
     fi
@@ -9,9 +9,10 @@ extract_logic() {
 
     if [[ $# -gt 1 ]]; then
         local last_arg="${@[-1]}"
-        if [[ -d "$last_arg" ]]; then
+        if [[ -d "$last_arg" || ! -f "$last_arg" ]]; then
             dest="$last_arg"
             files=("${@[1,-2]}")
+            [[ ! -d "$dest" ]] && mkdir -p "$dest"
         else
             files=("$@")
         fi
@@ -36,18 +37,18 @@ extract_logic() {
 }
 
 pack_logic() {
-    local target=$1
-    shift
-    local count=$#
-
-    if [[ -z "$target" || $count -eq 0 ]]; then
+    if [[ $# -lt 2 ]]; then
         print -P "%F{yellow}󰋖 Usage:%f p <filename.ext> <files...>"
         return 1
     fi
 
-    if [[ -z "${target:e}" ]]; then
+    local target=$1
+    shift
+    local count=$#
+
+    if [[ "${target:t}" != *.* ]]; then
         target="${target}.tar.gz"
-        print -P "%F{yellow} %BWarnin: No extension detected,using default set:%b%f %F{blue}%B$target%b%f"
+        print -P "%F{yellow} %BWarning:%b%f No extension detected, using default: %F{blue}%B$target%b%f"
     fi
 
     print -P "%F{blue}󰿖 %f Packing %B%F{magenta}$count%f%b item(s) into %B%F{cyan}'$target'%f%b..."
