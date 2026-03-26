@@ -2,16 +2,18 @@
 
 > **Use antidote config zsh**
 
-- introduction: use 'fzf-tab','p10k','zsh-suggestions' etc plugins, very beautify,practical and power.
+- Introduction: use 'fzf-tab','p10k','zsh-suggestions' etc plugins, very beautify,practical and power.
 
-- 1. Installed require cli
-  - The: 'fd','fzf','git','eza','nerd-font','ripgrep','zoxide'.
-- 2. Download and install antidote plugin manage
+- Ensure terminal is **zsh**
+- 1. Install necessary CLI programs and fonts.
+  - CLI programs: 'fd','fzf','git','eza','ripgrep','zoxide','bsdtar'.
+  - Goto [nerdfonts](https://www.nerdfonts.com) website, download you like nerdfont
+- 2. Download and install antidote plugin.
   - Terminal enter: 'git clone --depth=1 https://github.com/mattmc3/antidote.git $HOME/.local/share/.antidote'
 - 3. Configure zsh
   - Terminal enter: 'git clone --depth=1 https://github.com/vojor/zsh.git $HOME/.config/zsh'
 - 4. configure zsh start
-  - Terminal enter: 'touch .zshrc'
+  - Terminal enter: 'rm ~/.zshrc && touch .zshrc'
   - copy up to '.zshrc'
   - startup: 'source ~/.zshrc'
 
