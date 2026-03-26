@@ -36,7 +36,7 @@ if [[ ! -f "${XDG_DATA_HOME}/.antidote/antidote.zsh" ]]; then
         if git clone --depth=1 https://github.com/mattmc3/antidote.git "${XDG_DATA_HOME}/.antidote" &>/dev/null;then
             print -P "%F{green}󰄬 Antidote installed successfully!%f"
 
-            local deps=("eza" "fzf" "fd" "rg","zoxide")
+            local deps=("eza" "fzf" "fd" "rg" "zoxide")
             local missing=()
             for tool in $deps; do
                 if ! command -v "$tool" &>/dev/null; then missing+=("$tool"); fi

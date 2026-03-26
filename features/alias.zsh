@@ -1,15 +1,17 @@
 # core revise
 alias sudo='sudo '
-alias watch='watch '
 alias time='time '
+alias watch='watch '
 alias xargs='xargs '
 
-# shell builtin
+# system extend
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -iv --preserve-root'
 alias mkdir='mkdir -pv'
-alias ez='exec zsh'
+alias chmod='chmod --preserve-root -v'
+alias chown='chown --preserve-root -v'
+alias chgrp='chgrp --preserve-root -v'
 
 ## replace GNU
 alias dir='eza -lbF --git'
@@ -50,36 +52,36 @@ smart_alias() {
         local reason="'$primary'"
         [[ -n "$fallback" ]] && reason="'$primary' and '$fallback'"
         print -P "%F{160} Warning: $reason taken! Please use original: %B$target%b%f"
-
         return 0
     fi
 }
 
 # 函数
-smart_alias pn "proxy_on"
-smart_alias pf "proxy_off"
 smart_alias au "antidote-update"
+smart_alias pf "proxy_off"
+smart_alias pn "proxy_on"
 
 # 带参数操作 (管道符使用单引号)
-smart_alias zc 'cd ~/.config/zsh && tree'
+smart_alias cza "chezmoi apply"
+smart_alias cze "chezmoi edit"
+smart_alias czd "chezmoi cd"
+smart_alias ez='exec zsh'
+smart_alias in "ig --editor neovim"
 smart_alias l "eza -lagh --icons"
 smart_alias la "eza -a --icons"
 smart_alias ll "eza -lgh --icons"
-smart_alias pt "procs -t"
-smart_alias ign "ig --editor neovim"
 smart_alias nc "nvim --clean"
-smart_alias cze "chezmoi edit"
-smart_alias cza "chezmoi apply"
-smart_alias czd "chezmoi cd"
-smart_alias guc "git -C $VCPKG_ROOT pull"
+smart_alias pt "procs -t"
+smart_alias uc "git -C $VCPKG_ROOT pull"
+smart_alias zc 'cd ~/.config/zsh && tree'
 
 # long to short
-smart_alias n vi "nvim"
-smart_alias lg "lazygit"
-smart_alias cz "chezmoi"
-smart_alias cs "codespell"
 smart_alias ac "aria2c"
-smart_alias ht "htop"
+smart_alias atr "autocorrect"
+smart_alias cs "codespell"
+smart_alias cz "chezmoi"
+smart_alias lg "lazygit"
 smart_alias hy "hexyl"
 smart_alias hf "hyperfine"
-smart_alias atr "autocorrect"
+smart_alias n vi "nvim"
+smart_alias prt "print"

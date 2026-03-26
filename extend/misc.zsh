@@ -1,3 +1,8 @@
+# Direnv
+if (( $+commands[direnv] )); then
+    eval "$(direnv hook zsh)"
+fi
+
 # --- Zoxide ---
 ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 ZOXIDE_CACHE="$ZSH_CACHE_DIR/zoxide_init.zsh"
