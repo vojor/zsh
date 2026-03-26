@@ -13,17 +13,36 @@ key=(
     Tab       "${terminfo[ht]:-$'\t'}"
 )
 
+function zle-line-init() {
+    [[ -n "$terminfo[smkx]" ]] && echoti smkx
+}
+function zle-line-finish() {
+    [[ -n "$terminfo[rmkx]" ]] && echoti rmkx
+}
+zle -N zle-line-init
+zle -N zle-line-finish
+
 _safe_bind() {
     local widget="$1"
     shift
-    for seq in "$@"; do
-        [[ -n "$seq" ]] && bindkey -- "$seq" "$widget"
-    done
+    if (( $+widgets[$widget] )) || (( $+functions[$widget] )); then
+        for seq in "$@"; do
+            [[ -n "$seq" ]] && bindkey -- "$seq" "$widget"
+        done
+    fi
 }
 
 _safe_bind beginning-of-line     "${key[Home]}" "^A"
 _safe_bind end-of-line           "${key[End]}" "^E"
-_safe_bind toggle-overwrite      "${key[Insert]}"
+if [[ -n "${key[Insert]}" ]]; then
+    if (( $+widgets[overwrite-mode] )); then
+        _safe_bind overwrite-mode "${key[Insert]}"
+    elif (( $+widgets[toggle-overwrite] )); then
+        _safe_bind toggle-overwrite "${key[Insert]}"
+    else
+        _safe_bind undefined-key "${key[Insert]}"
+    fi
+fi
 _safe_bind delete-char           "${key[Delete]}"
 _safe_bind backward-delete-char  "${key[Backspace]}" "^?" "^H"
 _safe_bind clear-screen          "^L"
@@ -40,16 +59,18 @@ typeset -g HISTORY_SUBSTRING_SEARCH_GLOBBING_FLAGS='i'
 typeset -g HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='fg=magenta,bold'
 typeset -g HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg=red,bold'
 
+local up_widget="up-line-or-beginning-search"
+local down_widget="down-line-or-beginning-search"
 if (( $+widgets[history-substring-search-up] )); then
-    _safe_bind history-substring-search-up   "${key[Up]}"   '^[[A' '^P'
-    _safe_bind history-substring-search-down "${key[Down]}" '^[[B' '^N'
+    up_widget="history-substring-search-up"
+    down_widget="history-substring-search-down"
 else
     autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
     zle -N up-line-or-beginning-search
     zle -N down-line-or-beginning-search
-    _safe_bind up-line-or-beginning-search   "${key[Up]}"   '^[[A' '^P'
-    _safe_bind down-line-or-beginning-search "${key[Down]}" '^[[B' '^N'
 fi
+_safe_bind "$up_widget"   "${key[Up]}"   '^[[A' '^P'
+_safe_bind "$down_widget" "${key[Down]}" '^[[B' '^N'
 
 if (( $+widgets[fzf-history-widget] )); then
     bindkey '^R' fzf-history-widget
@@ -59,4 +80,6 @@ fi
 
 autoload -Uz edit-command-line
 zle -N edit-command-line
-_safe_bind edit-command-line '^X^E' '^Xe'
+if (( $+functions[edit-command-line] )); then
+    _safe_bind edit-command-line '^X^E' '^Xe'
+fi
