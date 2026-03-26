@@ -6,11 +6,7 @@ romkatv/zsh-defer
 
 # completion and initializing
 mattmc3/ez-compinit
-zsh-users/zsh-completions
 hlissner/zsh-autopair
-
-# bridging
-getantidote/use-omz
 
 # Frame plugins(from omz)
 ohmyzsh/ohmyzsh path:plugins/git

@@ -1,3 +1,7 @@
+# 开启补全缓存
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' cache-path "$ZSH_CACHE_DIR/zompcache"
+
 # 优先使用 vivid。否则退回 LS_COLORS, 仅在 LS_COLORS 为空时初始化
 if [[ -z "$LS_COLORS" ]]; then
     if (( $+commands[vivid] )); then
