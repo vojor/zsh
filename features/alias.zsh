@@ -31,7 +31,6 @@ alias zfgrep='ugrep -zF'
 alias xdump='ugrep -X ""'
 alias zmore='ugrep+ -z -I -+ --pager ""'
 
-# 首选简写，备用简写 (可选),目标命令/函数
 smart_alias() {
     local primary=$1
     local fallback=$2
@@ -44,11 +43,9 @@ smart_alias() {
 
     if (( ! $+commands[$primary] )); then
         alias $primary="$target"
-
     elif [[ -n "$fallback" ]] && (( ! $+commands[$fallback] )); then
         alias $fallback="$target"
         print -P "%F{244}󰋖 Note: '$primary' taken by $(command -v $primary), used '$fallback' instead.%f"
-
     else
         local reason="'$primary'"
         [[ -n "$fallback" ]] && reason="'$primary' and '$fallback'"
@@ -71,10 +68,15 @@ smart_alias ll "eza -lgh --icons"
 smart_alias pt "procs -t"
 smart_alias ign "ig --editor neovim"
 smart_alias nc "nvim --clean"
+smart_alias cze "chezmoi edit"
+smart_alias cza "chezmoi apply"
+smart_alias czd "chezmoi cd"
+smart_alias guc "git -C $VCPKG_ROOT pull"
 
 # long to short
 smart_alias n vi "nvim"
 smart_alias lg "lazygit"
+smart_alias cz "chezmoi"
 smart_alias cs "codespell"
 smart_alias ac "aria2c"
 smart_alias ht "htop"
