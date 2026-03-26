@@ -2,10 +2,15 @@
 zstyle ':completion:*' use-cache yes
 zstyle ':completion:*' cache-path "$ZSH_CACHE_DIR/zompcache"
 
-# 优先使用 vivid。否则退回 LS_COLORS, 仅在 LS_COLORS 为空时初始化
+# 优先使用 vivid
 if [[ -z "$LS_COLORS" ]]; then
     if (( $+commands[vivid] )); then
-        export LS_COLORS="$(vivid generate tokyonight-night)"
+        local breeze_theme="$XDG_CONFIG_HOME/vivid/themes/breeze.yml"
+        if [[ -f "$breeze_theme" ]]; then
+            export LS_COLORS="$(vivid generate "$breeze_theme")"
+        else
+            export LS_COLORS="$(vivid generate snazzy)"
+        fi
     elif (( $+commands[dircolors] )); then
         eval "$(dircolors -b)"
     fi
@@ -63,7 +68,7 @@ zle_highlight=(
     suffix:bold
 )
 
-# Tab 逻辑 (调用 fzf-tab 插件)
+# Tab 逻辑
 user-complete(){
     case "$BUFFER" in
         "" )

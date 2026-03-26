@@ -1,43 +1,62 @@
 typeset -g -A key
+
 key=(
-    Home      "${terminfo[khome]}"
-    End       "${terminfo[kend]}"
-    Insert    "${terminfo[kich1]}"
-    Delete    "${terminfo[kdch1]}"
-    Up        "${terminfo[kcuu1]}"
-    Down      "${terminfo[kcud1]}"
-    Left      "${terminfo[kcub1]}"
-    Right     "${terminfo[kcuf1]}"
-    Backspace "${terminfo[kbs]}"
+    Home      "${terminfo[khome]:-^[[H}"
+    End       "${terminfo[kend]:-^[[F}"
+    Insert    "${terminfo[kich1]:-^[[2~}"
+    Delete    "${terminfo[kdch1]:-^[[3~}"
+    Up        "${terminfo[kcuu1]:-^[[A}"
+    Down      "${terminfo[kcud1]:-^[[B}"
+    Left      "${terminfo[kcub1]:-^[[D}"
+    Right     "${terminfo[kcuf1]:-^[[C}"
+    Backspace "${terminfo[kbs]:-^?}"
     Tab       "${terminfo[ht]:-$'\t'}"
 )
 
-# 基础功能键绑定
-[[ -n "${key[Home]}"      ]] && bindkey -- "${key[Home]}"      beginning-of-line
-[[ -n "${key[End]}"       ]] && bindkey -- "${key[End]}"       end-of-line
-[[ -n "${key[Insert]}"    ]] && bindkey -- "${key[Insert]}"    overwrite-mode
-[[ -n "${key[Delete]}"    ]] && bindkey -- "${key[Delete]}"    delete-char
-[[ -n "${key[Backspace]}" ]] && bindkey -- "${key[Backspace]}" backward-delete-char
+_safe_bind() {
+    local widget="$1"
+    shift
+    for seq in "$@"; do
+        [[ -n "$seq" ]] && bindkey -- "$seq" "$widget"
+    done
+}
 
-# Ctrl + 左右键 (单词间跳转)
-bindkey '^[[1;5C' forward-word       # Ctrl + Right
-bindkey '^[[1;5D' backward-word      # Ctrl + Left
+_safe_bind beginning-of-line     "${key[Home]}" "^A"
+_safe_bind end-of-line           "${key[End]}" "^E"
+_safe_bind toggle-overwrite      "${key[Insert]}"
+_safe_bind delete-char           "${key[Delete]}"
+_safe_bind backward-delete-char  "${key[Backspace]}" "^?" "^H"
+_safe_bind clear-screen          "^L"
+
+# 单词跳转
+_safe_bind forward-word  '^[[1;5C' '^[[5C' '^[[1;3C' '^[f'
+_safe_bind backward-word '^[[1;5D' '^[[5D' '^[[1;3D' '^[b'
+
+# 单词删除
+_safe_bind kill-word              '^[d' '^[[3;5~'
+_safe_bind backward-kill-word     '^W'
+
+typeset -g HISTORY_SUBSTRING_SEARCH_GLOBBING_FLAGS='i'
+typeset -g HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='fg=magenta,bold'
+typeset -g HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg=red,bold'
 
 if (( $+widgets[history-substring-search-up] )); then
-    [[ -n "${key[Up]}"   ]] && bindkey -- "${key[Up]}"   history-substring-search-up
-    [[ -n "${key[Down]}" ]] && bindkey -- "${key[Down]}" history-substring-search-down
-    bindkey '^[[A' history-substring-search-up
-    bindkey '^[[B' history-substring-search-down
-
-    HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=magenta,fg=white,bold'
-    HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='bg=red,fg=white,bold'
+    _safe_bind history-substring-search-up   "${key[Up]}"   '^[[A' '^P'
+    _safe_bind history-substring-search-down "${key[Down]}" '^[[B' '^N'
 else
     autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
     zle -N up-line-or-beginning-search
     zle -N down-line-or-beginning-search
-
-    [[ -n "${key[Up]}"   ]] && bindkey -- "${key[Up]}"   up-line-or-beginning-search
-    [[ -n "${key[Down]}" ]] && bindkey -- "${key[Down]}" down-line-or-beginning-search
-    bindkey '^[[A' up-line-or-beginning-search
-    bindkey '^[[B' down-line-or-beginning-search
+    _safe_bind up-line-or-beginning-search   "${key[Up]}"   '^[[A' '^P'
+    _safe_bind down-line-or-beginning-search "${key[Down]}" '^[[B' '^N'
 fi
+
+if (( $+widgets[fzf-history-widget] )); then
+    bindkey '^R' fzf-history-widget
+else
+    bindkey '^R' history-incremental-search-backward
+fi
+
+autoload -Uz edit-command-line
+zle -N edit-command-line
+_safe_bind edit-command-line '^X^E' '^Xe'
