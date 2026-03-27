@@ -6,5 +6,5 @@ export EDITOR='nvim'
 export MANPAGER='nvim +Man! -'
 
 export LESS='-R --mouse --wheel-lines=3'
-export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
 export ZSH_AUTOSUGGEST_USE_ASYNC=1

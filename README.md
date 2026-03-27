@@ -25,10 +25,12 @@ fi
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
 export ZSH_CONFIG_DIR="${XDG_CONFIG_HOME}/zsh"
 export ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
 export ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
-mkdir -p "$ZSH_CONFIG_DIR" "$ZSH_CACHE_DIR" "$ZSH_DATA_DIR" 2>/dev/null
+export ZSH_STATE_DIR="${XDG_STATE_HOME}/zsh"
+mkdir -p "$ZSH_CONFIG_DIR" "$ZSH_CACHE_DIR" "$ZSH_DATA_DIR" "$ZSH_STATE_DIR" 2>/dev/null
 
 if [[ ! -f "${XDG_DATA_HOME}/.antidote/antidote.zsh" ]]; then
     if [[ -n "$all_proxy" || -n "$http_proxy" || -n "$https_proxy" ]]; then
