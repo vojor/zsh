@@ -10,7 +10,7 @@ else
 fi
 
 # Define update logic
-antidote-update() {
+ad_bundle() {
     print -P "%F{blue}󰚰 %BUpdating bundle to install plugins...%b%f"
 
     if [[ -z "$all_proxy" ]] && [[ -z "$http_proxy" || -z "$https_proxy" ]]; then
@@ -42,7 +42,7 @@ antidote-update() {
 if [[ ! -f "$ZSH_BUNDLE_FILE" || "$ZSH_PLUGIN_FILE" -nt "$ZSH_BUNDLE_FILE" ]]; then
     print -P "%F{green}󱐥 %BInitializing or updating plugins...%b%f"
 
-    if antidote-update; then
+    if ad_bundle; then
         :
     elif [[ -f "$ZSH_BUNDLE_FILE" ]]; then
         print -P "%F{242}󰔚 %BWarning:%b%f %F{242}Update failed, falling back to existing bundle.%f"
