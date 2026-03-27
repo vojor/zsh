@@ -79,6 +79,7 @@ smart_alias ll "eza -lgh --icons"
 smart_alias nc "nvim --clean"
 smart_alias pt "procs -t"
 smart_alias zc "cd ~/.config/zsh && tree"
+smart_alias zg "cd ~/.config/nvim/lua/gionvim && ls"
 
 # long to short
 smart_alias ac "aria2c"
