@@ -43,3 +43,11 @@ export FZF_DEFAULT_OPTS="
   --bind 'alt-j:preview-down,alt-k:preview-up'
   --color=header:italic
 "
+# vi-mode
+export KEYTIMEOUT=10
+ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
+ZVM_CURSOR_STYLE_ENABLED=true
+ZVM_HIGHLIGHT_ALL_COMMANDS=false
+ZVM_HIGHLIGHT_IDLE_DELAY=0
+ZVM_AUTO_UPDATE=false
+ZVM_INIT_MODE=sourcing

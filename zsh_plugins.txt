@@ -20,3 +20,6 @@ Aloxaf/fzf-tab
 zdharma-continuum/fast-syntax-highlighting
 zsh-users/zsh-autosuggestions kind:defer
 zsh-users/zsh-history-substring-search
+
+# few tips
+jeffreytse/zsh-vi-mode
