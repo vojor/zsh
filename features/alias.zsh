@@ -65,11 +65,13 @@ fi
 smart_alias au "ad_bundle"
 smart_alias pf "proxy_off"
 smart_alias pn "proxy_on"
+smart_alias ui "update_cli"
 
 # 带参数操作 (管道符使用单引号)
 smart_alias cza "chezmoi apply"
 smart_alias cze "chezmoi edit"
 smart_alias czd "chezmoi cd"
+smart_alias ep 'env | grep proxy'
 smart_alias ez "exec zsh"
 smart_alias gdf "git dft"
 smart_alias in "ig --editor neovim"

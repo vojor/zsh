@@ -27,3 +27,6 @@ source "$ZSH_CONFIG_DIR/utils/colorscheme.zsh"
 # 按键绑定和定义别名
 source "$ZSH_CONFIG_DIR/features/alias.zsh"
 source "$ZSH_CONFIG_DIR/features/keybind.zsh"
+
+# 有用的工具函数
+source "$ZSH_CONFIG_DIR/features/update-cli.zsh"
