@@ -31,7 +31,7 @@ update_cli() {
             local n=${${(s/|/)apps[$i]}[1]//[[:space:]]/}
             printf "%2d) %s\n" $i $n
         done
-        print -P -- "\n%F{yellow}用法:%f update-cli(别名ui) [序号/all]"
+        print -P -- "\n%F{yellow}用法:%f update_cli(别名ui) [序号/all]"
         return
     fi
 
