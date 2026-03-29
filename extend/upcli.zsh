@@ -14,37 +14,52 @@ cli_apps_list=(
 
 update_cli() {
     if [[ -z "$http_proxy" && -z "$HTTP_PROXY" ]]; then
-        print -P -- "%F{244}[%D{%H:%M:%S}]%f %F{yellow}󰒄 检测到未开启代理，尝试调用 proxy_on...%f"
+        print -P -- "%F{244}[%D{%H:%M:%S}]%f %F{yellow}󰒄 检测到未开启代理，尝试启动代理配置...%f"
         (( $+functions[proxy_on] )) && proxy_on
     fi
 
+    local ver_regex='[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?'
+
     if [[ "$1" == "all" ]]; then
-        print -P -- "%F{magenta}󰑐 正在并行检查所有软件更新...%f"
+        local old_opts=$(set +o | grep monitor)
+        set +m
+
+        local -i total=${#cli_apps_list[@]}
+        local all_results_tmp=$(mktemp)
         typeset -A remote_vers
-        local tmp_file=$(mktemp)
-        for i in {1..${#cli_apps_list[@]}}; do
+
+        print -P -- "%F{magenta}󰑐 正在检查所有软件更新...%f"
+
+        for i in {1..$total}; do
             (
                 local item="${cli_apps_list[$i]}"
                 local repo="${${(@s/|/)item}[2]//[[:space:]]/}"
-                local ver_regex='[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?'
-
-                local r_ver=$(curl -sIL --connect-timeout 5 "https://github.com/$repo/releases/latest" | \
+                local r_ver=$(curl -sIL --connect-timeout 5 --max-time 12 "https://github.com/$repo/releases/latest" 2>/dev/null | \
                                grep -i "location:" | grep -oE "$ver_regex" | head -n1 | tr -d 'v')
-                print -r -- "$i:$r_ver" >> "$tmp_file"
+                print -r -- "$i:${r_ver:-fail}" >> "$all_results_tmp"
             ) &
         done
 
         wait
+        eval "$old_opts"
 
         while IFS=: read -r idx v; do
             remote_vers[$idx]=$v
-        done < "$tmp_file"
-        \rm -f "$tmp_file"
+        done < "$all_results_tmp"
+        command rm -f "$all_results_tmp"
 
-        for i in {1..${#cli_apps_list[@]}}; do
-            update_cli $i ${remote_vers[$i]}
+        for j in {1..$total}; do
+            local v=$remote_vers[$j]
+            if [[ "$v" == "fail" || -z "$v" ]]; then
+                local n="${${(@s/|/)cli_apps_list[$j]}[1]//[[:space:]]/}"
+                print -P -- "\n%F{red}󰅚 %f%F{green}$n%f: %F{red}获取远程版本失败。%f"
+            else
+                update_cli $j "$v"
+            fi
         done
-        return
+
+        print -P -- "\n%F{green}✨ 所有程序检查完毕！%f"
+        return 0
     fi
 
     local input_val="$1"
@@ -53,16 +68,10 @@ update_cli() {
 
     if [[ -n "$input_val" ]]; then
         if [[ "$input_val" =~ ^[0-9]+$ ]]; then
-            if [[ "$input_val" -ge 1 && "$input_val" -le ${#cli_apps_list[@]} ]]; then
-                target_idx=$input_val
-            fi
+            (( input_val >= 1 && input_val <= ${#cli_apps_list[@]} )) && target_idx=$input_val
         else
             for i in {1..${#cli_apps_list[@]}}; do
-                local app_name="${${(@s/|/)cli_apps_list[$i]}[1]//[[:space:]]/}"
-                if [[ "${(L)app_name}" == "${(L)input_val}" ]]; then
-                    target_idx=$i
-                    break
-                fi
+                [[ ${(L)${${(@s/|/)cli_apps_list[$i]}[1]//[[:space:]]/}} == ${(L)input_val} ]] && { target_idx=$i; break; }
             done
         fi
     fi
@@ -73,11 +82,12 @@ update_cli() {
         local i=1
         for item in $cli_apps_list; do
             local n="${${(@s/|/)item}[1]//[[:space:]]/}"
-            printf "  %F{cyan}%2d)%f  %-15s\n" $i "$n"
+            local line=$(printf "  %2d)  %-15s" $i "$n")
+            print -P -- "  %F{cyan}󱞩 ${line:2:4}%f${line:6}"
             ((i++))
         done
         print -P -- "%F{240}──────────────────────────────%f"
-        print -P -- "%F{yellow}用法:%f update_cli %F{green}[序号 / 名称 / all]%f"
+        print -P -- "%F{yellow}󱈸 用法:%f update_cli (别名:%F{cyan}ui%f) %F{green}[序号/名称/all]%f"
         return
     fi
 
@@ -86,9 +96,8 @@ update_cli() {
     selected=("${(@)selected%%[[:space:]]##}")
     local name=$selected[1] repo=$selected[2] cmd=$selected[3] dl_tpl=$selected[4]
 
-    print -P -- "\n%F{blue}󰚰 %f正在检查 %F{white}$name%f 的版本状态..."
+    print -P -- "\n%F{blue}󰚰 %f正在检查 %F{green}$name%f 的版本状态..."
 
-    local ver_regex='[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?'
     local raw_local_ver=$($cmd --version 2>&1 | grep -oE "$ver_regex" | head -n1)
     [[ -z "$raw_local_ver" ]] && raw_local_ver=$($cmd -version 2>&1 | grep -oE "$ver_regex" | head -n1)
     local local_ver=${raw_local_ver#v}
@@ -104,7 +113,7 @@ update_cli() {
         return 1
     fi
 
-    print -P -- "%F{244}  本地:%f ${local_ver:-'未安装'} %F{244}󰁔 最新:%f %F{cyan}$remote_ver%f"
+    print -P -- "%F{244}󰓅 本地版本:%f ${local_ver:-'未安装'} %F{yellow}󰁔%f %F{blue}最新版本:%f %F{cyan}$remote_ver%f"
 
     if [[ "$local_ver" == "$remote_ver" ]]; then
         print -P -- "%F{green}󰄬 已是最新版本。%f"
@@ -112,7 +121,7 @@ update_cli() {
     fi
 
     print -P -- "%F{yellow}󰛒 发现新版本！%f"
-    print -Pn -- "%F{244}  是否自动更新? [y/N]: %f"
+    print -Pn -- "%F{cyan}󱈸 %f%F{244}是否自动更新? [y/N]: %f"
     read -k 1 res; print ""
 
     if [[ "$res" == "y" || "$res" == "Y" ]]; then
@@ -129,34 +138,50 @@ update_cli() {
                 if (( $+functions[extract_logic] )); then
                     extract_logic "$tmp_dir/$filename" "$tmp_dir" > /dev/null
                 else
-                    tar -xf "$tmp_dir/$filename" -C "$tmp_dir" 2>/dev/null || unzip -q "$tmp_dir/$filename" -d "$tmp_dir" 2>/dev/null
+                    if (( $+commands[bsdtar] )); then
+                        bsdtar -xf "$tmp_dir/$filename" -C "$tmp_dir" 2>/dev/null
+                    else
+                        tar -xf "$tmp_dir/$filename" -C "$tmp_dir" 2>/dev/null || unzip -q "$tmp_dir/$filename" -d "$tmp_dir" 2>/dev/null
+                    fi
                 fi
             fi
 
-            local binary_path=$(fd -t f -x -H -I "^${cmd}$" "$tmp_dir" | head -n1)
-            [[ -z $binary_path ]] && binary_path=$(fd -t f -x -H -I "${cmd}.*linux" "$tmp_dir" | head -n1)
+            local binary_path=$(fd -t f -H -I "^${cmd}$" "$tmp_dir" | head -n1)
+            [[ -z $binary_path ]] && binary_path=$(fd -t f -H -I "${cmd}.*linux" "$tmp_dir" | head -n1)
 
             if [[ -n $binary_path ]]; then
-                [[ -f "$target_path" ]] && cp "$target_path" "${target_path}.bak"
-
-                if mv "$binary_path" "$target_path"; then
-                    chmod u+x "$target_path"
-                    if "$target_path" --version &>/dev/null || "$target_path" -version &>/dev/null; then
-                        print -P -- "%F{green}󰄬 $name 更新成功！%f"
-                        \rm -f "${target_path}.bak"
+                local backup_success=0
+                if [[ -f "$target_path" ]]; then
+                    if command cp "$target_path" "${target_path}.bak" 2>/dev/null; then
+                        backup_success=1
                     else
-                        print -P -- "%F{red}󰅚 警告：新版二进制运行异常，已执行回滚。%f"
-                        mv "${target_path}.bak" "$target_path"
+                        print -P -- "%F{yellow}󰀨 警告：%f备份旧版本失败，跳过本次更新以保安全。"
+                        command rm -rf "$tmp_dir"; return 1
                     fi
                 fi
-                \rm -rf "$tmp_dir"
+
+                if command mv "$binary_path" "$target_path"; then
+                    command chmod u+x "$target_path"
+
+                    if "$target_path" --version &>/dev/null || "$target_path" -version &>/dev/null; then
+                        print -P -- "%F{green}󰄬 $name %f更新成功！"
+                        [[ $backup_success -eq 1 ]] && command rm -f "${target_path}.bak"
+                    else
+                        print -P -- "%F{yellow}󰀨 警告：%f新版本运行异常，正在执行回滚..."
+                        if [[ $backup_success -eq 1 ]]; then
+                             command mv "${target_path}.bak" "$target_path" && \
+                             print -P -- "%F{green}󰄬 已成功回滚至旧版本。%f"
+                        fi
+                    fi
+                fi
             else
-                print -P -- "%F{red}󰅚 错误：包内未找到可执行文件 '$cmd'%f"
-                print -P -- "%F{yellow}现场已保留: %u$tmp_dir%u%f"
+                print -P -- "%F{red}󰅚 错误：%f包内未找到可执行文件 %F{green}'$cmd'%f"
+                print -P -- "%F{yellow}󰚌 现场已保留: %f%F%U{blue}$tmp_dir%u%f"
+                return 1
             fi
         else
             print -P -- "%F{red}󰅚 下载失败。%f"
-            \rm -rf "$tmp_dir"
         fi
+        [[ -d "$tmp_dir" ]] && command rm -rf "$tmp_dir"
     fi
 }
