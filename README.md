@@ -1,21 +1,29 @@
-# Zsh Config
+# Configure your ZSH
 
 > **Use antidote config zsh**
 
-- Introduction: use 'fzf-tab','p10k','zsh-suggestions' etc plugins, very beautify,practical and power.
+- Introduction: zsh use **fzf-tab,p10k,zsh-suggestions** etc plugins, very beautify,practical and power.
 
-- Ensure terminal is **zsh**
-- 1. Install necessary CLI programs and fonts.
-  - CLI programs: 'fd','fzf','git','eza','ripgrep','zoxide','bsdtar'.
-  - Goto [nerdfonts](https://www.nerdfonts.com) website, download you like nerdfont
-- 2. Download and install antidote plugin.
-  - Terminal enter: 'git clone --depth=1 https://github.com/mattmc3/antidote.git $HOME/.local/share/.antidote'
-- 3. Configure zsh
-  - Terminal enter: 'git clone --depth=1 https://github.com/vojor/zsh.git $HOME/.config/zsh'
-- 4. configure zsh start
-  - Terminal enter: 'rm ~/.zshrc && touch .zshrc'
-  - copy up to '.zshrc'
-  - startup: 'source ~/.zshrc'
+## Ensure terminal is **zsh**
+
+1. Install necessary CLI programs and nerdfonts.
+
+- CLI programs: **_bsdtar,fd,fzf,git,eza,ripgrep,ugrep,zoxide_**.
+- Goto [nerdfonts](https://www.nerdfonts.com) website, download you like nerdfont.
+
+2. Download and install antidote plugin.
+
+- Terminal enter: `git clone --depth=1 https://github.com/mattmc3/antidote.git $HOME/.local/share/.antidote`
+
+3. Configure zsh
+
+- Terminal enter: `git clone --depth=1 https://github.com/vojor/zsh.git $HOME/.config/zsh`
+
+4. configure zsh start
+
+- Terminal enter: `rm ~/.zshrc && touch ~/.zshrc`
+- copy up to `.zshrc`
+- startup: `exec zsh`
 
 ```sh
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -38,7 +46,7 @@ if [[ ! -f "${XDG_DATA_HOME}/.antidote/antidote.zsh" ]]; then
         if git clone --depth=1 https://github.com/mattmc3/antidote.git "${XDG_DATA_HOME}/.antidote" &>/dev/null;then
             print -P "%F{green}󰄬 Antidote installed successfully!%f"
 
-            local deps=("eza" "fzf" "fd" "rg" "zoxide")
+            local deps=("bsdtar" "eza" "fzf" "fd" "rg" "ugrep" "zoxide")
             local missing=()
             for tool in $deps; do
                 if ! command -v "$tool" &>/dev/null; then missing+=("$tool"); fi
