@@ -60,6 +60,9 @@ if (( $+commands[ugrep] )); then
     alias xdump='ugrep -X ""'
     alias zmore='ugrep+ -z -I -+ --pager ""'
 fi
+if (( $+commands[rg] )); then
+    alias rg='rg --column --colors="line:fg:yellow" --colors="path:fg:green" --colors="path:style:bold" --colors="match:style:bold"'
+fi
 
 # shell function
 smart_alias au "ad_bundle"

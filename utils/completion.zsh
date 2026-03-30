@@ -115,6 +115,6 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $real
 zstyle ':fzf-tab:complete:kill:argument-rest' fzf-preview 'ps --pid=$word -o cmd --no-headers -w -w'
 zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags '--preview-window=down:3:wrap'
 zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'systemctl status $word'
-zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'echo ${(P)word}'
+zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'typeset -p $word' 2>/dev/null
 # 颜色分组
 zstyle ':fzf-tab:*' group-colors $'\033[32m' $'\033[33m' $'\033[35m' $'\033[31m'
