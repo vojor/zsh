@@ -27,19 +27,30 @@ elif (( $+commands[rg] )); then
 fi
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-local preview_logic='[[ -d {} ]] && eza --tree --color=always --icons {} | head -200 || (bat --color=always --style=numbers --line-range :500 {} 2>/dev/null || cat {})'
-
 export FZF_DEFAULT_OPTS="
-  --height 45%
-  --layout=reverse
-  --border
-  --info=inline
-  --preview '$preview_logic'
-  --preview-window=right:60%:wrap
+  --height 45% --layout=reverse --border --info=inline
   --bind 'ctrl-/:toggle-preview'
   --bind 'alt-j:preview-down,alt-k:preview-up'
   --color=header:italic
 "
+export FZF_CTRL_T_OPTS='
+  --preview "
+    if [[ -d {} ]]; then
+      eza --tree --color=always --icons {} | head -200
+    elif [[ ! -s {} ]]; then
+      print -P \"%F{yellow}󰟢 Empty File%f\"
+    else
+      if file --mime {} | grep -q \"binary\"; then
+        print -P \"%F{cyan}󰈲 Preview Unavailable%f\"
+        file -b {}
+      else
+        bat --color=always --style=numbers --line-range :500 {} 2>/dev/null || cat {}
+      fi
+    fi"
+  --preview-window=right:60%:wrap
+'
+export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:wrap"
+
 # vi-mode
 export KEYTIMEOUT=20
 ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT

@@ -27,10 +27,10 @@ zstyle ':completion:*' completer _expand_alias _complete _extensions _match _app
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
 # 补全菜单视觉格式化
-zstyle ':completion:*:descriptions' format '%B%F{yellow}󱆃 %d%f%b'
-zstyle ':completion:*:messages'     format '%B%F{magenta}󰍡 %d%f%b'
-zstyle ':completion:*:warnings'     format '%B%F{red}󰅚 No Matches Found%f%b'
-zstyle ':completion:*:corrections'  format '%B%F{green}󰁨 %d (errors: %e)%f%b'
+zstyle ':completion:*:*:*:*:descriptions' format '󱆃 %d'
+zstyle ':completion:*:*:*:*:messages'     format '󰍡 %d'
+zstyle ':completion:*:*:*:*:warnings'     format '󰅚 No Matches Found'
+zstyle ':completion:*:*:*:*:corrections'  format '󰁨 %d (errors: %e)'
 
 # 补全结果分组展示
 zstyle ':completion:*' group-name ''
@@ -38,6 +38,9 @@ zstyle ':completion:*' verbose yes
 zstyle ':completion:*:matches' group 'yes'
 zstyle ':completion:*:options' description 'yes'
 zstyle ':completion:*:options' auto-description '%d'
+# Tab 补全时各分组的显示顺序
+zstyle ':completion:*:*:-command-:*' group-order 'alias' 'builtins' 'functions' 'commands'
+zstyle ':completion:*:*:cd:*' group-order 'local-directories' 'path-directories' 'directory-stack'
 
 # 排除不必要的系统账户补全 (减少 Tab 时的干扰)
 zstyle ':completion:*:*:*:users' ignored-patterns \
@@ -54,7 +57,6 @@ zstyle ':completion:*:processes' command 'ps -u $USER -o pid,user,comm -w -w'
 
 # 路径补全：禁止补全当前目录 (./)
 zstyle ':completion:*' ignore-parents parent pwd
-
 # 特殊路径补全顺序
 zstyle ':completion:*:-tilde-:*' group-order 'named-directories' 'path-directories' 'users' 'expand'
 
@@ -97,12 +99,15 @@ fi
 
 # 预览逻辑变量
 local ft_preview_cmd='
-  if [[ -d $realpath ]]; then
+  if [[ -z "$realpath" ]]; then
+    echo "No path to preview"
+  elif [[ -d $realpath ]]; then
     eza --tree --color=always --icons $realpath | head -200
   else
-    bat --color=always --style=numbers --line-range :500 $realpath 2>/dev/null || cat $realpath
+    [[ -f $realpath ]] && bat --color=always --style=numbers --line-range :500 $realpath 2>/dev/null || cat $realpath
   fi
 '
+
 # 全局外观与交互
 zstyle ':fzf-tab:*' fzf-flags '--preview-window=right:60%:wrap' \
                               '--bind=ctrl-/:toggle-preview' \
@@ -115,6 +120,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $real
 zstyle ':fzf-tab:complete:kill:argument-rest' fzf-preview 'ps --pid=$word -o cmd --no-headers -w -w'
 zstyle ':fzf-tab:complete:kill:argument-rest' fzf-flags '--preview-window=down:3:wrap'
 zstyle ':fzf-tab:complete:systemctl-*:*' fzf-preview 'systemctl status $word'
-zstyle ':fzf-tab:complete:(-command-|-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'typeset -p $word' 2>/dev/null
+zstyle ':fzf-tab:complete:(-parameter-|-brace-parameter-|export|unset|expand):*' fzf-preview 'typeset -p $word 2>/dev/null'
+zstyle ':fzf-tab:complete:-command-:*' fzf-preview 'whence -p $word >/dev/null && (man $word | col -bx | head -20) || whence -v $word 2>/dev/null'
 # 颜色分组
 zstyle ':fzf-tab:*' group-colors $'\033[32m' $'\033[33m' $'\033[35m' $'\033[31m'
