@@ -11,6 +11,22 @@ cli_apps_list=(
     "oxfmt        | oxc-project/oxc             | oxfmt         | https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxfmt-x86_64-unknown-linux-musl.tar.gz"
     "oxlint       | oxc-project/oxc             | oxlint        | https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxlint-x86_64-unknown-linux-musl.tar.gz"
 )
+autoload -Uz is-at-least
+get_latest_version() {
+    local repo="$1"
+    local ver_regex='[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?'
+
+    local final_url
+    final_url=$(curl -sL -o /dev/null -w "%{url_effective}" \
+                --connect-timeout 5 \
+                --max-time 10 \
+                --retry 2 \
+                "https://github.com/${repo}/releases/latest" 2>/dev/null)
+    [[ $? -ne 0 || -z "$final_url" ]] && return 1
+    local tag="${final_url##*/}"
+    local ver_tag=$(print -r -- "$tag" | grep -oE "$ver_regex" | head -n1)
+    print -r -- "$ver_tag"
+}
 
 update_cli() {
     if [[ -z "$http_proxy" && -z "$HTTP_PROXY" ]]; then
@@ -27,15 +43,18 @@ update_cli() {
         local -i total=${#cli_apps_list[@]}
         local all_results_tmp=$(mktemp)
         typeset -A remote_vers
+        local max_jobs=5
 
         print -P -- "%F{magenta}󰑐 正在检查所有软件更新...%f"
 
         for i in {1..$total}; do
+            while (( ${#jobstates} >= max_jobs )); do
+                sleep 0.1
+            done
             (
                 local item="${cli_apps_list[$i]}"
                 local repo="${${(@s/|/)item}[2]//[[:space:]]/}"
-                local r_ver=$(curl -sIL --connect-timeout 5 --max-time 12 "https://github.com/$repo/releases/latest" 2>/dev/null | \
-                               grep -i "location:" | grep -oE "$ver_regex" | head -n1 | tr -d 'v')
+                local r_ver=$(get_latest_version "$repo")
                 print -r -- "$i:${r_ver:-fail}" >> "$all_results_tmp"
             ) &
         done
@@ -98,25 +117,32 @@ update_cli() {
 
     print -P -- "\n%F{blue}󰚰 %f正在检查 %F{green}$name%f 的版本状态..."
 
-    local raw_local_ver=$($cmd --version 2>&1 | grep -oE "$ver_regex" | head -n1)
-    [[ -z "$raw_local_ver" ]] && raw_local_ver=$($cmd -version 2>&1 | grep -oE "$ver_regex" | head -n1)
-    local local_ver=${raw_local_ver#v}
 
-    local remote_ver=$pre_fetched_ver
-    if [[ -z $remote_ver ]]; then
-        remote_ver=$(curl -sIL --connect-timeout 5 "https://github.com/$repo/releases/latest" | \
-                       grep -i "location:" | grep -oE "$ver_regex" | head -n1 | tr -d 'v')
+    local local_ver="未安装"
+    if (( $+commands[$cmd] )); then
+        local cmd_output=$($cmd --version 2>&1 || $cmd -version 2>&1)
+        local raw_local_ver=$(print "$cmd_output" | grep -oE "$ver_regex" | head -n1)
+        local_ver=${raw_local_ver#v}
+        [[ -z "$local_ver" ]] && local_ver="未知"
     fi
 
+    local remote_ver=${pre_fetched_ver:-$(get_latest_version "$repo")}
+    if [[ -z $remote_ver ]]; then
+        remote_ver=$(get_latest_version "$repo")
+    fi
     if [[ -z $remote_ver ]]; then
         print -P -- "%F{red}󰅚 错误：无法获取远程版本，请检查网络或代理。%f"
         return 1
     fi
 
-    print -P -- "%F{244}󰓅 本地版本:%f ${local_ver:-'未安装'} %F{yellow}󰁔%f %F{blue}最新版本:%f %F{cyan}$remote_ver%f"
+    print -P -- "%F{244}󰓅 本地版本:%f ${local_ver} %F{yellow}󰁔%f %F{blue}最新版本:%f %F{cyan}$remote_ver%f"
 
-    if [[ "$local_ver" == "$remote_ver" ]]; then
-        print -P -- "%F{green}󰄬 已是最新版本。%f"
+    local need_update=1
+    if [[ "$local_ver" != (未安装|未知) ]] && is-at-least "$remote_ver" "$local_ver"; then
+        need_update=0
+    fi
+    if (( ! need_update )); then
+        print -P -- "%F{green}󰄬 本地已是最新版本。%f"
         return 0
     fi
 
@@ -128,27 +154,53 @@ update_cli() {
         local final_url=${dl_tpl//\{VER\}/$remote_ver}
         local tmp_dir=$(mktemp -d)
         local filename="${final_url##*/}"
-        local target_path="$HOME/.local/bin/$cmd"
+        local target_path="${XDG_DATA_HOME}/bin/$cmd"
 
-        print -P "🚀 %F{cyan}下载中...%f"
-        if aria2c -x 16 -s 16 -d "$tmp_dir" -o "$filename" "$final_url"; then
+        print -P "🚀 %F{cyan}已确认更新，正在下载中...%f"
+        local download_success=0
+        if (( $+commands[aria2c] )); then
+            aria2c -x 16 -s 16 -d "$tmp_dir" -o "$filename" "$final_url" && download_success=1
+        elif (( $+commands[curl] )); then
+            print -P "%F{yellow}󱑤 aria2c 未找到，切换至 curl...%f"
+            curl -fLo "$tmp_dir/$filename" "$final_url" && download_success=1
+        elif (( $+commands[wget] )); then
+            print -P "%F{yellow}󱑤 aria2c/curl 未找到，切换至 wget...%f"
+            wget -qO "$tmp_dir/$filename" "$final_url" && download_success=1
+        fi
+        if [[ $download_success -eq 1 ]]; then
 
             if [[ "$filename" =~ '\.(tar\.(gz|zst|bz2|xz)|tgz|zip|7z)$' ]]; then
                 print -P "📦 %F{cyan}解压文件中...%f"
                 if (( $+functions[extract_logic] )); then
                     extract_logic "$tmp_dir/$filename" "$tmp_dir" > /dev/null
                 else
-                    if (( $+commands[bsdtar] )); then
-                        bsdtar -xf "$tmp_dir/$filename" -C "$tmp_dir" 2>/dev/null
-                    else
-                        tar -xf "$tmp_dir/$filename" -C "$tmp_dir" 2>/dev/null || unzip -q "$tmp_dir/$filename" -d "$tmp_dir" 2>/dev/null
-                    fi
+                    tar -xf "$tmp_dir/$filename" -C "$tmp_dir" 2>/dev/null || unzip -q "$tmp_dir/$filename" -d "$tmp_dir" 2>/dev/null
                 fi
             fi
 
-            local binary_path=$(fd -t f -H -I "^${cmd}$" "$tmp_dir" | head -n1)
-            [[ -z $binary_path ]] && binary_path=$(fd -t f -H -I "${cmd}.*linux" "$tmp_dir" | head -n1)
+            local binary_path=""
 
+            local search_res=( $tmp_dir/**/$cmd(Nf*) )
+            if (( ${#search_res} == 0 )); then
+                search_res=( $tmp_dir/**/*$cmd*(Nf*) )
+            fi
+            if [[ ${#search_res} -gt 0 ]]; then
+                binary_path=$search_res[1]
+            else
+                if (( $+commands[fd] )); then
+                    binary_path=$(fd -t f -H -I "^${cmd}$" "$tmp_dir" | head -n1)
+                else
+                    binary_path=$(find "$tmp_dir" -type f -name "$cmd" | head -n1)
+                fi
+            fi
+
+            if [[ -z $binary_path ]]; then
+                if (( $+commands[fd] )); then
+                    binary_path=$(fd -t f -H -I "${cmd}.*linux" "$tmp_dir" | head -n1)
+                else
+                    binary_path=$(find "$tmp_dir" -type f -executable -name "*${cmd}*linux*" | head -n1)
+                fi
+            fi
             if [[ -n $binary_path ]]; then
                 local backup_success=0
                 if [[ -f "$target_path" ]]; then
@@ -180,7 +232,7 @@ update_cli() {
                 return 1
             fi
         else
-            print -P -- "%F{red}󰅚 下载失败。%f"
+            print -P -- "%F{red}󰅚 下载失败,未找到下载工具(aria2c/curl/wget)/下载格式不正确/网络错误。%f"
         fi
         [[ -d "$tmp_dir" ]] && command rm -rf "$tmp_dir"
     fi
