@@ -63,6 +63,10 @@ fi
 if (( $+commands[rg] )); then
     alias rg='rg --column --colors="line:fg:yellow" --colors="path:fg:green" --colors="path:style:bold" --colors="match:style:bold"'
 fi
+if (( $+commands[win32yank] )); then
+    alias c='win32yank -i'
+    alias v='win32yank -o'
+fi
 
 # shell function
 smart_alias au "ad_bundle"

@@ -1,7 +1,5 @@
 export LANG=zh_CN.UTF-8
 export LANGUAGE=zh_CN:en_US
-export LC_ALL=zh_CN.UTF-8
-export LC_CTYPE=zh_CN.UTF-8
 
 export EDITOR='nvim'
 export VISUAL='nvim'
