@@ -1,16 +1,20 @@
-# 格式："显示名称 | GitHub 仓库 | 本地命令 | 下载模板"
+register_cli() {
+    local name=$1 repo=$2 cmd=$3 url=$4
+    cli_apps_list+=("${name// /}|${repo// /}|${cmd// /}|${url// /}")
+}
 typeset -ga cli_apps_list
-cli_apps_list=(
-    "autocorrect  | huacnlee/autocorrect        | autocorrect   | https://github.com/huacnlee/autocorrect/releases/download/v{VER}/autocorrect-linux-musl-amd64.tar.gz"
-    "bashunit     | TypedDevs/bashunit          | bashunit      | https://github.com/TypedDevs/bashunit/releases/download/{VER}/bashunit"
-    "checkmake    | checkmake/checkmake         | checkmake     | https://github.com/checkmake/checkmake/releases/download/v{VER}/checkmake-v{VER}.linux.amd64"
-    "dotenv-linter| dotenv-linter/dotenv-linter | dotenv-linter  | https://github.com/dotenv-linter/dotenv-linter/releases/download/v{VER}/dotenv-linter-linux-x86_64.tar.gz"
-    "grpcurl      | fullstorydev/grpcurl        | grpcurl       | https://github.com/fullstorydev/grpcurl/releases/download/v{VER}/grpcurl_{VER}_linux_x86_64.tar.gz"
-    "neocmakelsp  | neocmakelsp/neocmakelsp     | neocmakelsp   | https://github.com/neocmakelsp/neocmakelsp/releases/download/v{VER}/neocmakelsp-x86_64-unknown-linux-musl.tar.gz"
-    "ltrs         | jeertmans/languagetool-rust | ltrs          | https://github.com/jeertmans/languagetool-rust/releases/download/v{VER}/ltrs-v{VER}-x86_64-unknown-linux-musl.tar.gz"
-    "oxfmt        | oxc-project/oxc             | oxfmt         | https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxfmt-x86_64-unknown-linux-musl.tar.gz"
-    "oxlint       | oxc-project/oxc             | oxlint        | https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxlint-x86_64-unknown-linux-musl.tar.gz"
-)
+cli_apps_list=()
+# "显示名称 | GitHub 仓库 | 本地命令 | 下载模板"
+register_cli "autocorrect"   "huacnlee/autocorrect"        "autocorrect"   "https://github.com/huacnlee/autocorrect/releases/download/v{VER}/autocorrect-linux-musl-amd64.tar.gz"
+register_cli "bashunit"      "TypedDevs/bashunit"          "bashunit"      "https://github.com/TypedDevs/bashunit/releases/download/{VER}/bashunit"
+register_cli "checkmake"     "checkmake/checkmake"         "checkmake"     "https://github.com/checkmake/checkmake/releases/download/v{VER}/checkmake-v{VER}.linux.amd64"
+register_cli "dotenv-linter" "dotenv-linter/dotenv-linter" "dotenv-linter" "https://github.com/dotenv-linter/dotenv-linter/releases/download/v{VER}/dotenv-linter-linux-x86_64.tar.gz"
+register_cli "grpcurl"       "fullstorydev/grpcurl"        "grpcurl"       "https://github.com/fullstorydev/grpcurl/releases/download/v{VER}/grpcurl_{VER}_linux_x86_64.tar.gz"
+register_cli "neocmakelsp"   "neocmakelsp/neocmakelsp"     "neocmakelsp"   "https://github.com/neocmakelsp/neocmakelsp/releases/download/v{VER}/neocmakelsp-x86_64-unknown-linux-musl.tar.gz"
+register_cli "ltrs"          "jeertmans/languagetool-rust" "ltrs"          "https://github.com/jeertmans/languagetool-rust/releases/download/v{VER}/ltrs-v{VER}-x86_64-unknown-linux-musl.tar.gz"
+register_cli "oxfmt"         "oxc-project/oxc"             "oxfmt"         "https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxfmt-x86_64-unknown-linux-musl.tar.gz"
+register_cli "oxlint"        "oxc-project/oxc"             "oxlint"        "https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxlint-x86_64-unknown-linux-musl.tar.gz"
+
 autoload -Uz is-at-least
 get_latest_version() {
     local repo="$1"
@@ -42,6 +46,7 @@ update_cli() {
 
         local -i total=${#cli_apps_list[@]}
         local all_results_tmp=$(mktemp)
+        trap 'command rm -f "$all_results_tmp"' EXIT INT TERM
         typeset -A remote_vers
         local max_jobs=5
 
@@ -53,7 +58,7 @@ update_cli() {
             done
             (
                 local item="${cli_apps_list[$i]}"
-                local repo="${${(@s/|/)item}[2]//[[:space:]]/}"
+                local repo="${${(@s/|/)item}[2]}"
                 local r_ver=$(get_latest_version "$repo")
                 print -r -- "$i:${r_ver:-fail}" >> "$all_results_tmp"
             ) &
@@ -66,6 +71,7 @@ update_cli() {
             remote_vers[$idx]=$v
         done < "$all_results_tmp"
         command rm -f "$all_results_tmp"
+        trap - EXIT INT TERM
 
         for j in {1..$total}; do
             local v=$remote_vers[$j]
@@ -111,9 +117,8 @@ update_cli() {
     fi
 
     local raw_item="${cli_apps_list[$target_idx]}"
-    local selected=("${(@)${(@s/|/)raw_item}##[[:space:]]##}")
-    selected=("${(@)selected%%[[:space:]]##}")
-    local name=$selected[1] repo=$selected[2] cmd=$selected[3] dl_tpl=$selected[4]
+    local name repo cmd dl_tpl
+    IFS='|' read -r name repo cmd dl_tpl <<< "$raw_item"
 
     print -P -- "\n%F{blue}󰚰 %f正在检查 %F{green}$name%f 的版本状态..."
 
@@ -154,7 +159,7 @@ update_cli() {
         local final_url=${dl_tpl//\{VER\}/$remote_ver}
         local tmp_dir=$(mktemp -d)
         local filename="${final_url##*/}"
-        local target_path="${XDG_DATA_HOME}/bin/$cmd"
+        local target_path="$HOME/.local/bin/$cmd"
 
         print -P "🚀 %F{cyan}已确认更新，正在下载中...%f"
         local download_success=0
@@ -179,28 +184,22 @@ update_cli() {
             fi
 
             local binary_path=""
-
-            local search_res=( $tmp_dir/**/$cmd(Nf*) )
-            if (( ${#search_res} == 0 )); then
-                search_res=( $tmp_dir/**/*$cmd*(Nf*) )
-            fi
-            if [[ ${#search_res} -gt 0 ]]; then
-                binary_path=$search_res[1]
+            if (( $+commands[fd] )); then
+                binary_path=$(fd -t f -H -I "^${cmd}$" "$tmp_dir" | head -n1)
             else
-                if (( $+commands[fd] )); then
-                    binary_path=$(fd -t f -H -I "^${cmd}$" "$tmp_dir" | head -n1)
-                else
-                    binary_path=$(find "$tmp_dir" -type f -name "$cmd" | head -n1)
-                fi
+                binary_path=$(find "$tmp_dir" -type f -name "$cmd" | head -n1)
             fi
-
-            if [[ -z $binary_path ]]; then
+            if [[ -z "$binary_path" ]]; then
                 if (( $+commands[fd] )); then
                     binary_path=$(fd -t f -H -I "${cmd}.*linux" "$tmp_dir" | head -n1)
                 else
                     binary_path=$(find "$tmp_dir" -type f -executable -name "*${cmd}*linux*" | head -n1)
                 fi
             fi
+            if [[ -z "$binary_path" ]]; then
+                binary_path=$(find "$tmp_dir" -type f -executable -name "*${cmd}*" | head -n1)
+            fi
+
             if [[ -n $binary_path ]]; then
                 local backup_success=0
                 if [[ -f "$target_path" ]]; then
