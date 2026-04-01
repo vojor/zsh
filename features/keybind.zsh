@@ -34,26 +34,22 @@ _safe_bind() {
 
 _safe_bind beginning-of-line     "${key[Home]}" "^A"
 _safe_bind end-of-line           "${key[End]}" "^E"
-if [[ -n "${key[Insert]}" ]]; then
-    if (( $+widgets[overwrite-mode] )); then
-        _safe_bind overwrite-mode "${key[Insert]}"
-    elif (( $+widgets[toggle-overwrite] )); then
-        _safe_bind toggle-overwrite "${key[Insert]}"
-    else
-        _safe_bind undefined-key "${key[Insert]}"
-    fi
-fi
 _safe_bind delete-char           "${key[Delete]}"
 _safe_bind backward-delete-char  "${key[Backspace]}" "^?" "^H"
 _safe_bind clear-screen          "^L"
-
-# 单词跳转
-_safe_bind forward-word  '^[[1;5C' '^[[5C' '^[[1;3C' '^[f'
-_safe_bind backward-word '^[[1;5D' '^[[5D' '^[[1;3D' '^[b'
-
-# 单词删除
-_safe_bind kill-word              '^[d' '^[[3;5~'
 _safe_bind backward-kill-word     '^W'
+local overwrite_widget="undefined-key"
+(( $+widgets[overwrite-mode] )) && overwrite_widget="overwrite-mode"
+(( $+widgets[toggle-overwrite] )) && overwrite_widget="toggle-overwrite"
+if [[ -n "${key[Insert]}" ]]; then
+    _safe_bind "$overwrite_widget" "${key[Insert]}"
+fi
+
+autoload -Uz edit-command-line
+zle -N edit-command-line
+if (( $+functions[edit-command-line] )); then
+    _safe_bind edit-command-line '^X^E' '^Xe'
+fi
 
 typeset -g HISTORY_SUBSTRING_SEARCH_GLOBBING_FLAGS='i'
 typeset -g HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='fg=magenta,bold'
@@ -69,17 +65,32 @@ else
     zle -N up-line-or-beginning-search
     zle -N down-line-or-beginning-search
 fi
-_safe_bind "$up_widget"   "${key[Up]}"   '^[[A' '^P'
-_safe_bind "$down_widget" "${key[Down]}" '^[[B' '^N'
 
-if (( $+widgets[fzf-history-widget] )); then
-    bindkey '^R' fzf-history-widget
-else
-    bindkey '^R' history-incremental-search-backward
-fi
+function zvm_after_init() {
+    zvm_bindkey viins '^R' fzf-history-widget
+    zvm_bindkey vicmd '^R' fzf-history-widget
+    zvm_bindkey viins '^T' fzf-file-widget
+    zvm_bindkey vicmd '^T' fzf-file-widget
+    zvm_bindkey viins '\ec' fzf-cd-widget
+    zvm_bindkey vicmd '\ec' fzf-cd-widget
+    zvm_bindkey viins '^I' user-complete
 
-autoload -Uz edit-command-line
-zle -N edit-command-line
-if (( $+functions[edit-command-line] )); then
-    _safe_bind edit-command-line '^X^E' '^Xe'
-fi
+
+    zvm_bindkey viins "${key[Up]}"   "$up_widget"
+    zvm_bindkey viins '^[[A'         "$up_widget"
+    zvm_bindkey viins '^P'           "$up_widget"
+    zvm_bindkey viins "${key[Down]}" "$down_widget"
+    zvm_bindkey viins '^[[B'         "$down_widget"
+    zvm_bindkey viins '^N'           "$down_widget"
+
+    zvm_bindkey viins '^[[1;5C' forward-word
+    zvm_bindkey viins '^[[1;5D' backward-word
+    zvm_bindkey viins '^[[1;3C' forward-word
+    zvm_bindkey viins '^[[1;3D' backward-word
+    zvm_bindkey viins '^[f'     forward-word
+    zvm_bindkey viins '^[b'     backward-word
+
+    zvm_bindkey viins '^[d'     kill-word
+    zvm_bindkey viins '^[[3;5~' kill-word
+    [[ -n "${key[Insert]}" ]] && zvm_bindkey viins "${key[Insert]}" "$overwrite_widget"
+}

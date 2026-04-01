@@ -4,22 +4,21 @@ romkatv/powerlevel10k
 # Basic
 romkatv/zsh-defer
 
-# completion and initializing
+# Pairs and initializing
 mattmc3/ez-compinit
 hlissner/zsh-autopair
 
-# Frame plugins(from omz)
-ohmyzsh/ohmyzsh path:plugins/git
-ohmyzsh/ohmyzsh path:plugins/fzf kind:defer
-
-# Jump
+# Tools
 ajeetdsouza/zoxide
+unixorn/git-extra-commands
+
+# Completion UI
 Aloxaf/fzf-tab
 
-# highlight and suggestion
+# Few tips
+jeffreytse/zsh-vi-mode
+
+# Highlight and suggestion
 zdharma-continuum/fast-syntax-highlighting
 zsh-users/zsh-autosuggestions kind:defer
 zsh-users/zsh-history-substring-search
-
-# few tips
-jeffreytse/zsh-vi-mode

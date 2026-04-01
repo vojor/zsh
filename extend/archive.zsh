@@ -25,6 +25,8 @@ extract_logic() {
             print -P "%F{red}󰅚 %f File %B%F{cyan}'$file'%f%b not found, skipping..."
             continue
         fi
+        local extra_args=()
+        [[ "$file" == *.zip ]] && extra_args=(--strategy=zip)
 
         print -P "%F{blue}󰛒 %f Extracting %B%F{cyan}'$file'%f%b to %B%F{yellow}'$dest'%f%b..."
 

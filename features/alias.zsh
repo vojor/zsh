@@ -80,7 +80,6 @@ smart_alias cze "chezmoi edit"
 smart_alias czd "chezmoi cd"
 smart_alias ep 'env | grep proxy'
 smart_alias ez "exec zsh"
-smart_alias gdf "git dft"
 smart_alias in "ig --editor neovim"
 smart_alias l "eza -lagh --icons"
 smart_alias la "eza -a --icons"
@@ -100,6 +99,54 @@ smart_alias hy "hexyl"
 smart_alias hf "hyperfine"
 smart_alias n "nvim" "nv"
 smart_alias prt "print"
+
+# git
+# 基础操作
+smart_alias g "git"
+smart_alias gs "git status"
+smart_alias ga "git add"
+smart_alias gc "git commit -m"
+smart_alias gca "git commit --amend"
+smart_alias gp "git push"
+smart_alias gpf "git push --force-with-lease"
+gpsup() {
+  local branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  if [[ -z "$branch" ]]; then
+    echo "Error: Not on a branch."
+    return 1
+  fi
+  git push -u origin "$branch"
+}
+smart_alias ggph "gpsup"
+smart_alias gl "git pull"
+glsup() {
+  local branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  if [[ -z "$branch" ]]; then
+    echo "Error: Not on a branch."
+    return 1
+  fi
+
+  if ! git pull --quiet --dry-run >/dev/null 2>&1; then
+    git pull origin "$branch"
+  else
+    git pull
+  fi
+}
+alias ggpl "glsup"
+# --- 分支与跳转 ---
+smart_alias gb "git branch"
+smart_alias gba "git branch -a"
+smart_alias gco "git checkout"
+smart_alias gcb "git checkout -b"
+# --- 差异与暂存 ---
+smart_alias gd "git diff"
+smart_alias gds "git diff --staged"
+smart_alias gdf "git dft"
+smart_alias gsta "git stash push"
+smart_alias gstp "git stash pop"
+# --- 日志视图 ---
+smart_alias glo "git log --oneline --decorate --graph --all"
+smart_alias glg "git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 
 uc() {
     if [[ -z "$VCPKG_ROOT" ]]; then
