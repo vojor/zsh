@@ -1,6 +1,6 @@
 extract_logic() {
     if [[ $# -lt 1 ]]; then
-        print -P "%F{yellow}󰋖 Usage:%f x <file1> <file2> ... [destination_dir]"
+        print -P "%F{yellow}󰋖 Usage:%f %F{green}x%f [files ...] %F{blue}[destination_dir]%f"
         return 1
     fi
 
@@ -38,7 +38,7 @@ extract_logic() {
 
 pack_logic() {
     if [[ $# -lt 2 ]]; then
-        print -P "%F{yellow}󰋖 Usage:%f p <filename.ext> <files...>"
+        print -P "%F{yellow}󰋖 Usage:%f %F{green}p%f %F{112}[filename.ext]%f [files...]"
         return 1
     fi
 
