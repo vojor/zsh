@@ -3,6 +3,10 @@ if [[ -n $ZSH_MODULAR_LOADED && ! -o INTERACTIVE ]]; then
     return
 fi
 typeset -g ZSH_MODULAR_LOADED=1
+autoload -Uz zrecompile
+autoload -Uz edit-command-line
+autoload -Uz is-at-least
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
 
 # 代理配置
 source "$ZSH_CONFIG_DIR/boot/proxy.zsh"

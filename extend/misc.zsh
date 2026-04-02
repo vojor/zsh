@@ -1,25 +1,35 @@
-# Direnv
 if (( $+commands[direnv] )); then
-    eval "$(direnv hook zsh)"
+    DIRENV_CACHE="$ZSH_CACHE_DIR/direnv_init.zsh"
+    DIRENV_BIN=$(whence -p direnv)
+    if [[ -n "$DIRENV_BIN" ]]; then
+        if [[ ! -f "$DIRENV_CACHE" || "$DIRENV_BIN" -nt "$DIRENV_CACHE" ]]; then
+            "$DIRENV_BIN" hook zsh >| "$DIRENV_CACHE" 2>/dev/null
+            zrecompile -pq "$DIRENV_CACHE"
+        fi
+        if [[ -r "$DIRENV_CACHE" ]]; then
+            source "$DIRENV_CACHE"
+        fi
+    else
+        :
+    fi
 fi
 
-# --- Zoxide ---
-ZOXIDE_CACHE="$ZSH_CACHE_DIR/zoxide_init.zsh"
-ZOXIDE_BIN=$(whence -p zoxide)
-
-if [[ -n "$ZOXIDE_BIN" ]]; then
-    if [[ ! -f "$ZOXIDE_CACHE" || "$ZOXIDE_BIN" -nt "$ZOXIDE_CACHE" ]]; then
-        "$ZOXIDE_BIN" init zsh >| "$ZOXIDE_CACHE" 2>/dev/null
+if (( $+commands[zoxide] )); then
+    ZOXIDE_CACHE="$ZSH_CACHE_DIR/zoxide_init.zsh"
+    ZOXIDE_BIN=$(whence -p zoxide)
+    if [[ -n "$ZOXIDE_BIN" ]]; then
+        if [[ ! -f "$ZOXIDE_CACHE" || "$ZOXIDE_BIN" -nt "$ZOXIDE_CACHE" ]]; then
+            "$ZOXIDE_BIN" init zsh >| "$ZOXIDE_CACHE" 2>/dev/null
+            zrecompile -pq "$ZOXIDE_CACHE"
+        fi
+        if [[ -r "$ZOXIDE_CACHE" ]]; then
+            source "$ZOXIDE_CACHE"
+        fi
+    else
+        :
     fi
-
-    if [[ -r "$ZOXIDE_CACHE" ]]; then
-        source "$ZOXIDE_CACHE"
-    fi
-else
-    :
 fi
 
-# --- Fzf ---
 if (( $+commands[fzf] )); then
     export FZF_DEFAULT_OPTS="
         --height 45% --layout=reverse --border --info=inline
@@ -54,7 +64,19 @@ if (( $+commands[fzf] )); then
     export FZF_ALT_C_COMMAND="fd --type d --hidden --strip-cwd-prefix --exclude .git"
     export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always --icons {} | head -200'"
 
-    source <(fzf --zsh)
+    FZF_CACHE="$ZSH_CACHE_DIR/fzf_init.zsh"
+    FZF_BIN=$(whence -p fzf)
+    if [[ -n "$FZF_BIN" ]]; then
+        if [[ ! -f "$FZF_CACHE" || "$FZF_BIN" -nt "$FZF_CACHE" ]]; then
+            "$FZF_BIN" --zsh >| "$FZF_CACHE" 2>/dev/null
+            zrecompile -pq "$FZF_CACHE"
+        fi
+        if [[ -r "$FZF_CACHE" ]]; then
+            source "$FZF_CACHE"
+        fi
+    else
+        :
+    fi
 fi
 
 # vi-mode

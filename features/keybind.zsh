@@ -45,7 +45,6 @@ if [[ -n "${key[Insert]}" ]]; then
     _safe_bind "$overwrite_widget" "${key[Insert]}"
 fi
 
-autoload -Uz edit-command-line
 zle -N edit-command-line
 if (( $+functions[edit-command-line] )); then
     _safe_bind edit-command-line '^X^E' '^Xe'
@@ -61,7 +60,6 @@ if (( $+widgets[history-substring-search-up] )); then
     up_widget="history-substring-search-up"
     down_widget="history-substring-search-down"
 else
-    autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
     zle -N up-line-or-beginning-search
     zle -N down-line-or-beginning-search
 fi

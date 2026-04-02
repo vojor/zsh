@@ -24,6 +24,9 @@ ad_bundle() {
         if antidote bundle < "$ZSH_PLUGIN_FILE" >! "$TMP_BUNDLE"; then
             if [[ -s "$TMP_BUNDLE" ]]; then
                 mv -f "$TMP_BUNDLE" "$ZSH_BUNDLE_FILE"
+                if [[ ! -f "${ZSH_BUNDLE_FILE}.zwc" ]]; then
+                    zrecompile -pq "$ZSH_BUNDLE_FILE"
+                fi
                 source "$ZSH_BUNDLE_FILE"
                 print -P "%F{244}[%D{%H:%M:%S}]%f %F{green}󰄬 %BSuccess:%b%f %F{blue}Plugins bundled and loaded.%f"
             else

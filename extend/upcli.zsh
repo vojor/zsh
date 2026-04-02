@@ -15,7 +15,6 @@ register_cli "ltrs"          "jeertmans/languagetool-rust" "ltrs"          "http
 register_cli "oxfmt"         "oxc-project/oxc"             "oxfmt"         "https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxfmt-x86_64-unknown-linux-musl.tar.gz"
 register_cli "oxlint"        "oxc-project/oxc"             "oxlint"        "https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxlint-x86_64-unknown-linux-musl.tar.gz"
 
-autoload -Uz is-at-least
 get_latest_version() {
     local repo="$1"
     local ver_regex='[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?'
