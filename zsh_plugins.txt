@@ -9,7 +9,6 @@ mattmc3/ez-compinit
 hlissner/zsh-autopair
 
 # Tools
-ajeetdsouza/zoxide
 unixorn/git-extra-commands
 
 # Completion UI
