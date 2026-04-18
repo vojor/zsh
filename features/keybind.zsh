@@ -69,8 +69,8 @@ function zvm_after_init() {
     zvm_bindkey vicmd '^R' fzf-history-widget
     zvm_bindkey viins '^T' fzf-file-widget
     zvm_bindkey vicmd '^T' fzf-file-widget
-    zvm_bindkey viins '\ec' fzf-cd-widget
-    zvm_bindkey vicmd '\ec' fzf-cd-widget
+    zvm_bindkey viins '^[c' fzf-cd-widget
+    zvm_bindkey vicmd '^[c' fzf-cd-widget
     zvm_bindkey viins '^I' user-complete
 
 
