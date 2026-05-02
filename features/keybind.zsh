@@ -54,16 +54,11 @@ typeset -g HISTORY_SUBSTRING_SEARCH_GLOBBING_FLAGS='i'
 typeset -g HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='fg=magenta,bold'
 typeset -g HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg=red,bold'
 
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+
 local up_widget="up-line-or-beginning-search"
 local down_widget="down-line-or-beginning-search"
-if (( $+widgets[history-substring-search-up] )); then
-    up_widget="history-substring-search-up"
-    down_widget="history-substring-search-down"
-else
-    zle -N up-line-or-beginning-search
-    zle -N down-line-or-beginning-search
-fi
-
 function zvm_after_init() {
     zvm_bindkey viins '^R' fzf-history-widget
     zvm_bindkey vicmd '^R' fzf-history-widget

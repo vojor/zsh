@@ -20,4 +20,3 @@ jeffreytse/zsh-vi-mode
 # Highlight and suggestion
 zdharma-continuum/fast-syntax-highlighting
 zsh-users/zsh-autosuggestions kind:defer
-zsh-users/zsh-history-substring-search

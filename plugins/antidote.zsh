@@ -42,12 +42,12 @@ ad_bundle() {
     fi
 }
 
-if [[ ! -f "$ZSH_BUNDLE_FILE" || "$ZSH_PLUGIN_FILE" -nt "$ZSH_BUNDLE_FILE" ]]; then
+if [[ ! -f "$ZSH_BUNDLE_FILE" || "$ZSH_PLUGIN_FILE" -nt "$ZSH_BUNDLE_FILE" || ! -s "$ZSH_BUNDLE_FILE" ]]; then
     print -P "%F{green}󱐥 %BInitializing or updating plugins...%b%f"
 
     if ad_bundle; then
-        :
-    elif [[ -f "$ZSH_BUNDLE_FILE" ]]; then
+        source "$ZSH_BUNDLE_FILE"
+    elif [[ -s "$ZSH_BUNDLE_FILE" ]]; then
         print -P "%F{242}󰔚 %BWarning:%b%f %F{242}Update failed, falling back to existing bundle.%f"
         source "$ZSH_BUNDLE_FILE"
     else
