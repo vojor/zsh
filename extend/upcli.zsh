@@ -14,6 +14,7 @@ register_cli "neocmakelsp"   "neocmakelsp/neocmakelsp"     "neocmakelsp"   "http
 register_cli "ltrs"          "jeertmans/languagetool-rust" "ltrs"          "https://github.com/jeertmans/languagetool-rust/releases/download/v{VER}/ltrs-v{VER}-x86_64-unknown-linux-musl.tar.gz"
 register_cli "oxfmt"         "oxc-project/oxc"             "oxfmt"         "https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxfmt-x86_64-unknown-linux-musl.tar.gz"
 register_cli "oxlint"        "oxc-project/oxc"             "oxlint"        "https://github.com/oxc-project/oxc/releases/download/apps_v{VER}/oxlint-x86_64-unknown-linux-musl.tar.gz"
+register_cli "panache"       "jolars/panache"              "panache"       "https://github.com/jolars/panache/releases/download/v{VER}/panache-x86_64-unknown-linux-musl.tar.gz"
 
 get_latest_version() {
     local repo="$1"
